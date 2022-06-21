@@ -1,14 +1,16 @@
 <script>
     import { createEventDispatcher } from 'svelte'; 
-    import LongLogo from './icons/LongLogo.svelte';
+    import LongLogo from '../../../static/icons/LongLogo.svelte';
+    
     const dispatch = createEventDispatcher() ;
 </script>
-
-<div id="header">
-    <div id="main_container">
-        <div on:click={() => dispatch('tabChange', 'home')}><LongLogo/></div>
+<!-- <header> -->
+    <div id="header">
+        <div id="main_container">
+            <div on:click={() => dispatch('tabChange', 'home')}><LongLogo/></div>
+        </div>
     </div>
-</div>
+<!-- </header> -->
 
 <style>
     #main_container {
