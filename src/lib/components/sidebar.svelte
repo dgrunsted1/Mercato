@@ -18,7 +18,6 @@
     function hideShowDock(){
         expanded = !expanded;
     }
-    console.log(pages);
 </script>
 
 <div id="sidebar" class:expanded>
