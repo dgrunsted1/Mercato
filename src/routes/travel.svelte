@@ -1,17 +1,24 @@
+<script context="module">
+    export async function load({ fetch }) {
+      const url = `/apis/get_itinerary_data`;
+      const response = await fetch(url);
+  
+      return {
+        status: response.status,
+        props: {
+            input_data: response.ok && (await response.json())
+        }
+      };
+    }
+  </script>
 <script>
 
     let entry_types = ['activity', 'travel', 'stay'];
     let entries = [{}];
     let curr_type = entry_types[0];
-    let input_data = [{"activity": 
-                    [[{"name": "Title", "type": "text"}, {"name": "description", "type": "text"}], [{"name": "start", "type": "date"}, {"name": "end", "type": "date"}, {"name": "location", "type": "text"}, {"name": "link", "type": "text"}]]
-                }, {"travel": [
-                    [[{"name": "Title", "type": "text"}, {"name": "description", "type": "text"}], [{"name": "start", "type": "date"}, {"name": "end", "type": "date"}, {"name": "departure location", "type": "text"}, {"name": "arrival location", "type": "text"}, {"name": "link", "type": "text"}]]
-                ]}, {"stay": [
-                    [[{"name": "Title", "type": "text"}, {"name": "description", "type": "text"}], [{"name": "start", "type": "date"}, {"name": "end", "type": "date"}, {"name": "location", "type": "text"}, {"name": "link", "type": "text"}]]
-                ]}];
-
-    console.log(input_data[0]['activity']);
+    export let input_data;
+    input_data = input_data.input_data;
+    input_data = input_data[0];
     
     const add_entry = () => {
         let vals = document.getElementsByTagName('input');
@@ -48,13 +55,13 @@
                 {#each entry_types as curr}
                     <option value={curr}>{curr}</option>
                 {/each}</select></div>
-            {#each input_data[0][curr_type] as rows}
-            <div class="row">
-                {#each rows as curr}
-                    <div class="input"><label for={curr.name}>{curr.name}</label><input type="text" name={curr.name}></div>
+                {#each input_data[curr_type] as rows}
+                <div class="row">
+                    {#each rows as curr}
+                        <div class="input"><label for={curr.name}>{curr.name}</label><input type="text" name={curr.name}></div>
+                    {/each}
+                </div>
                 {/each}
-            </div>
-            {/each}
     
             
             <button class="button" on:click={add_entry}>ADD</button>
