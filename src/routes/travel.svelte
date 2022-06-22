@@ -100,7 +100,7 @@
         justify-content: space-evenly;
     }
     
-    .row > div, label{
+    .row > div{
         margin: 10px;
         flex-grow: 1;
     }
@@ -110,6 +110,7 @@
         width: 100%;
         margin: 0;
         flex-grow: 2;
+        padding-left: 20px;
     }
     select {
         margin:5px;
