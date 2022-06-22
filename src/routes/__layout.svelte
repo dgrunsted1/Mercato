@@ -6,7 +6,7 @@ let pages = ['wordle', 'travel', 'music', 'sports', 'fashion', 'cooking', 'tech'
 
 
 <Header />
-<SideBar />
+<SideBar {pages} />
 
 <main>
 <slot/>
@@ -18,7 +18,19 @@ let pages = ['wordle', 'travel', 'music', 'sports', 'fashion', 'cooking', 'tech'
 
 
 <style>
-    /* body {
-        margin: 0;
-    } */
+    main {
+		text-align: center;
+		margin: 0 auto;
+		height: 100%;
+	}
+
+	@media (min-width: 640px) {
+		main {
+			max-width: none;
+		}
+	}
+
+	main {
+		padding-top: 60px;
+	}
 </style>

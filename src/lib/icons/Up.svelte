@@ -1,13 +1,10 @@
-<script>
-    export let active;
-    $:color = active ? 'rgb(220, 196, 245)' : 'rgb(98, 1, 142)';
-</script>
+
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
 width="100%" style="opacity: 100%;"  viewBox="0 0 512.000000 512.000000"
  preserveAspectRatio="xMidYMid meet">
 
 <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-fill={color} stroke="none">
+fill='#002919' stroke="none">
 <path d="M2330 5110 c-494 -48 -950 -230 -1350 -538 -195 -150 -448 -432 -594
 -662 -63 -99 -186 -351 -230 -471 -49 -134 -102 -340 -128 -499 -31 -195 -31
 -565 0 -760 45 -276 116 -498 237 -745 132 -269 269 -460 489 -681 221 -220

@@ -1,23 +1,24 @@
 <script>
     import { createEventDispatcher } from 'svelte'; 
     const dispatch = createEventDispatcher() ;
-    import Around from '/static/icons/Around.svelte';
-    import Basketball from '/static/icons/Basketball.svelte';
-    import Cooking from '/static/icons/Cooking.svelte';
-    import Up from '/static/icons/Up.svelte';
-    import Down from '/static/icons/Down.svelte';
-    import Photography from '/static/icons/Photography.svelte';
-    import Clothes from '/static/icons/Clothes.svelte';
-    import Laptop from '/static/icons/Laptop.svelte';
-    import Music from '/static/icons/MusicIcon.svelte';
-    import Puzzle from '/static/icons/Puzzle.svelte';
+    import Around from '../icons/Around.svelte';
+    import Basketball from '../icons/Basketball.svelte';
+    import Cooking from '../icons/Cooking.svelte';
+    import Up from '../icons/Up.svelte';
+    import Down from '../icons/Down.svelte';
+    import Photography from '../icons/Photography.svelte';
+    import Clothes from '../icons/Clothes.svelte';
+    import Laptop from '../icons/Laptop.svelte';
+    import Music from '../icons/MusicIcon.svelte';
+    import Puzzle from '../icons/Puzzle.svelte';
     let expanded = false;
-    export let pages = [];
+    export let pages = [''];
     export let currPage = "";
 
     function hideShowDock(){
         expanded = !expanded;
     }
+    console.log(pages);
 </script>
 
 <div id="sidebar" class:expanded>
@@ -25,9 +26,9 @@
         <div id="page_container" class:expanded>
 
             {#each pages as page}
-                <div class="icon" class:expanded>
+                <div class="icon" class:expanded><a href="/{page}">
                     {#if page == 'travel'}
-                    <a href="/travel"><Around /></a>
+                    <Around active={currPage == page}/>
                     {:else if page == 'sports'}
                     <Basketball active={currPage == page}/>
                     {:else if page == 'photography'}
@@ -43,7 +44,7 @@
                     {:else if page == 'wordle'}
                     <Puzzle active={currPage == page}/>
                     {/if}
-                </div>
+                    </a></div>
             {/each }
         </div>
     

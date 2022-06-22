@@ -1,23 +1,21 @@
 <script>
     import { createEventDispatcher } from 'svelte'; 
-    import LongLogo from '../../../static/icons/LongLogo.svelte';
+    import LongLogo from '../icons/LongLogo.svelte';
     
     const dispatch = createEventDispatcher() ;
 </script>
-<!-- <header> -->
-    <div id="header">
+<header>
         <div id="main_container">
-            <div on:click={() => dispatch('tabChange', 'home')}><LongLogo/></div>
+            <a href="/"><LongLogo/></a>
         </div>
-    </div>
-<!-- </header> -->
+</header>
 
 <style>
     #main_container {
         padding: 5px 0px 0px 20px;
     }
 
-    #header {
+    header {
         display: flex;
         justify-content: left;
         position: fixed;
