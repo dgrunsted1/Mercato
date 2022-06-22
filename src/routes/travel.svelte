@@ -52,7 +52,7 @@
     
         <div id="new_entry_container">
             
-            <div class="row"><span >Type</span><div class="input"><select bind:value={curr_type} type="dropdown" name="Type">
+            <div class="row dropdown"><span >Type</span><div class="input"><select bind:value={curr_type} type="dropdown" name="Type">
                 {#each entry_types as curr}
                     <option value={curr}>{curr}</option>
                 {/each}</select></div></div>
@@ -130,7 +130,7 @@
         display: flex;
         flex-direction: row;
         border: 2px solid black;
-        
+        padding-left: 10px;
     }
 
 
@@ -161,6 +161,10 @@
         span {
             bottom: 1px;
             left: 25px;
+        }
+        
+        .dropdown {
+            width: 200px;
         }
     }
     </style>
