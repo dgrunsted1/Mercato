@@ -32,5 +32,8 @@ let pages = ['wordle', 'travel', 'music', 'sports', 'fashion', 'cooking', 'tech'
 
 	main {
 		padding-top: 60px;
+        z-index: 0;
+        max-width: 98%;
+        margin: auto;
 	}
 </style>

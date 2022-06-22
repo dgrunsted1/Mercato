@@ -51,14 +51,16 @@
         {/each}
     
         <div id="new_entry_container">
-            <div class="input"><label for="type">Type</label><select bind:value={curr_type} type="dropdown" name="Type">
+            
+            <div class="row"><span >Type</span><div class="input"><select bind:value={curr_type} type="dropdown" name="Type">
                 {#each entry_types as curr}
                     <option value={curr}>{curr}</option>
-                {/each}</select></div>
+                {/each}</select></div></div>
                 {#each input_data[curr_type] as rows}
                 <div class="row">
                     {#each rows as curr}
-                        <div class="input"><label for={curr.name}>{curr.name}</label><input type="text" name={curr.name}></div>
+                        <span for={curr.name}>{curr.name}</span>
+                        <div class="input"><input type="text" name={curr.name}></div>
                     {/each}
                 </div>
                 {/each}
@@ -98,8 +100,19 @@
         justify-content: space-evenly;
     }
     
-    .row > div, label, input {
+    .row > div, label{
         margin: 10px;
+        flex-grow: 1;
+    }
+
+    input, select {
+        line-height: 2;
+        width: 100%;
+        margin: 0;
+        flex-grow: 2;
+    }
+    select {
+        margin:5px;
     }
     
     /* .row > input {
@@ -121,6 +134,19 @@
     .input {
         display: flex;
         flex-direction: row;
+        border: 2px solid black;
+        
+    }
+
+
+
+    span {
+        position: relative;
+        bottom: -1.3em;
+        left: -6em;
+        background-color: white;
+        padding: 3px;
+        margin: auto;
     }
     
     .button:hover {
@@ -135,6 +161,11 @@
     
         .row {
             flex-wrap: nowrap;
+        }
+
+        span {
+            bottom: 1px;
+            left: 25px;
         }
     }
     </style>
