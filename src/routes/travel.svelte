@@ -115,12 +115,6 @@
         margin:5px;
     }
     
-    /* .row > input {
-    flex-grow: 5;
-    flex-shrink: 0;
-    
-    } */
-    
     .button {
       background-color: #c2fbd7;
       border-radius: 100px;
