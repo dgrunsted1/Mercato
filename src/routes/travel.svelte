@@ -18,7 +18,7 @@
     let curr_type = entry_types[0];
     export let input_data;
     input_data = input_data.input_data;
-    input_data = input_data[0];
+    input_data = input_data;
     
     const add_entry = () => {
         let vals = document.getElementsByTagName('input');
@@ -51,7 +51,7 @@
         {/each}
     
         <div id="new_entry_container">
-            <div class="input"><label for="type">Type</label><select type="dropdown" name="Type">
+            <div class="input"><label for="type">Type</label><select bind:value={curr_type} type="dropdown" name="Type">
                 {#each entry_types as curr}
                     <option value={curr}>{curr}</option>
                 {/each}</select></div>
