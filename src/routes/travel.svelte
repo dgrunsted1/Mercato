@@ -12,6 +12,9 @@
     }
   </script>
 <script>
+import { check_outros } from "svelte/internal";
+
+
     let trip_config = {
         default: {value: true, type:"none"}, 
         start_date: {value: "", type:"date"}, 
@@ -33,7 +36,7 @@
     let travel = {};
     let entry_types = [ 'travel', 'activity', 'stay'];
     let entries = {
-        travel: [
+        "travel": [
             {
                 title: "flight to italy",
                 departure_date: "2022-06-20T04:48",
@@ -93,20 +96,20 @@
             },
             {
                 title: "bus to solerno",
-                departure_date: "2022-06-04T07:48",
-                arrival_date: "2022-06-04T09:48",
+                departure_date: "2022-07-04T07:48",
+                arrival_date: "2022-07-04T09:48",
                 departure_location: "praiano",
                 arrival_location: "solerno"
             },
             {
                 title: "train to Rome",
-                departure_date: "2022-06-23T10:48",
-                arrival_date: "2022-06-23T15:48",
+                departure_date: "2022-07-05T10:48",
+                arrival_date: "2022-07-05T15:48",
                 departure_location: "solerno",
                 arrival_location: "rome"
             }
         ],
-        stays: [
+        "stays": [
             {
                 title: "Rome airbnb",
                 checkin_date: "2022-06-20T02:00",
@@ -138,7 +141,7 @@
                 city: "rome"
             }
         ],
-        activities: []
+        "activities": []
     };
 
 
@@ -178,15 +181,15 @@
             element.value = "";
             });
             if (!is_config){
-                entries.push(result);
-                entries = entries;
+                if (curr_type == 'activity') entries.activities.push(result);
+                // entries = entries;
             }
             
            
         }else {
             alert("missing value");
         }
-        
+        console.log(entries.activities);
     }
 
     const get_entries_for_the_day = (day_index, entries) => {
@@ -197,7 +200,25 @@
             let end = daysIntoYear(element.arrival_date ? element.arrival_date : element.checkout_date);
             if (    (start == day_to_return && end == day_to_return) ||
                     (start <= day_to_return && end >= day_to_return)){
-                result.push(element);
+                let temp_date = "";
+                if (start == day_to_return) temp_date = element.departure_date ? element.departure_date : `check-in: ${new Date(element.checkin_date).getHours()}:${new Date(element.checkin_date).getMinutes()}`;
+                if (end == day_to_return && !temp_date) temp_date = element.arrival_date ? element.arrival_date : `check-out: ${new Date(element.checkout_date).getHours()}:${new Date(element.checkout_date).getMinutes()}`;
+                else if (end == day_to_return && temp_date && element.departure_date) temp_date = `depart: ${new Date(element.departure_date).getHours()}:${new Date(element.departure_date).getMinutes()} arrive: ${new Date(element.arrival_date).getHours()}:${new Date(element.arrival_date).getMinutes()}`;
+                let temp_city = element.city ? element.city : `${element.departure_location} -> ${element.arrival_location}`;
+                let temp;
+                if (temp_date != "") {
+                    temp = {
+                        title: element.title,
+                        date: temp_date,
+                        city: temp_city
+                    }
+                }else {
+                    temp = {
+                        title: element.title,
+                        city: temp_city
+                    }
+                }
+                result.push(temp);
             }
         });
         return result;
@@ -207,40 +228,65 @@
         date = new Date(date);
         return (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
     }
-    const buildCalender = () => {
-        let start = new Date(trip_config.start_date.value);
-        let end = new Date(trip_config.return_date.value);
-        let difference_in_time = end.getTime() - start.getTime();
-        let num_days = (difference_in_time)/(1000*60*60*24);
-        let visual_area = document.getElementById('visual');
-        let calender = document.createElement("div");
-
-
-        let calender_title = document.createElement("div");
-        calender_title.style.width = "100%";
-        calender_title.style.backgroundColor = "pink";
-        calender_title.innerHTML = `Your ${num_days.toString()} day trip`;
-
-        let calender_main = document.createElement("div");
-        
-
-        calender.appendChild(calender_title);
-        visual_area?.append(calender);
-    }
+    
     </script>
     
     <div id="main_container">
-        <div class="row" id="visual">
+        <div id="visual"></div>
+        <div class="row">
             {#each Array(trip_days) as _, i}
                 <div class="day">
-                    <div class="date" id="date-{i}">day {i+1}</div>
+                    <div class="date" id="date-{i}">
+                        <p>Day {i+1}</p></div>
+                </div>
+            {/each}
+        </div>
+        <div class="row stays">
+            {#each Array(trip_days) as _, i}
+                <div class="day">
                     <div class="stay" id="stay-{i}">
-                        {#each get_entries_for_the_day(i, entries.stays) as {title}}
-                            <div class="card_text">{title}</div>
-                        {/each}
+                            {#each get_entries_for_the_day(i, entries.stays) as {title, city, date}}
+                                <div class="card_text"><p>{title}</p><p>{city}</p>
+                                    {#if date}<p>{date}</p>{/if}
+                                </div>
+                            {/each}
                     </div>
-                    <div class="activity" id="activity-{i}">activity</div>
-                    <div class="travel" id="travel-{i}">travel</div>
+                </div>
+            {/each}
+        </div>
+        <div class="row activities">
+            {#each Array(trip_days) as _, i}
+                <div class="day">
+                    <div class="activities" id="activity-{i}">
+                        {#if get_entries_for_the_day(i, entries.activities).length}
+                            {#each get_entries_for_the_day(i, entries.activities) as {title, city, date}}
+                                <div class="card_text"><p>{title}</p><p>{city}</p>
+                                    {#if date}<p>{date}</p>{/if}
+                                </div>
+                            {/each}
+                        {:else}
+                            <div class="card_text"><p>no activities today</p>
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+            {/each}
+        </div>
+        <div class="row travel">
+            {#each Array(trip_days) as _, i}
+                <div class="day">
+                    <div class="travel" id="travel-{i}">
+                        {#if get_entries_for_the_day(i, entries.travel).length}
+                            {#each get_entries_for_the_day(i, entries.travel) as {title, city, date}}
+                                <div class="card_text"><p>{title}</p><p>{city}</p>
+                                    {#if date}<p>{date}</p>{/if}
+                                </div>
+                            {/each}
+                        {:else}
+                        <div class="card_text"><p>no travel today</p>
+                        </div>
+                        {/if}
+                    </div>
                 </div>
             {/each}
         </div>
@@ -279,7 +325,6 @@
     
     
     
-    
     <style>
     
     #main_container {
@@ -290,7 +335,7 @@
         display: flex;
         flex-direction: column;
         width: 100%;
-        margin: 10px;
+        margin: 0px;
         flex-wrap: wrap;
     }
     
@@ -308,7 +353,7 @@
     }
     
     .row > div{
-        margin: 10px;
+        margin: 3px;
         flex-grow: 1;
     }
 
@@ -359,10 +404,36 @@
 
     .card_text {
         font-size: 12px;
+        border: 1px solid midnightblue;
+        border-radius: 8px;
+        padding: 0px 1px;
+    }
+
+    .stay > .card_text {
+        background-color: purple;
+        color: whitesmoke;
+    }
+
+    .travel > .card_text {
+        background-color: green;
+        color: white;
+    }
+
+    .activities > .card_text {
+        background-color: orange;
+        color: black;
+    }
+
+    p {
+        margin: 0px;
+    }
+
+    .day {
+        width: 200px;
     }
     
     @media only screen and (min-width: 600px) {
-        .row, .entry_container, #new_entry_container {
+        .row, #new_entry_container {
             flex-direction: row;
         }
     
