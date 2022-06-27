@@ -12,8 +12,6 @@
     }
   </script>
 <script>
-import { check_outros } from "svelte/internal";
-
 
     let trip_config = {
         default: {value: true, type:"none"}, 
@@ -32,121 +30,114 @@ import { check_outros } from "svelte/internal";
     }
 
 
-    let activities = {};
-    let travel = {};
+    
     let entry_types = [ 'travel', 'activity', 'stay'];
-    let entries = {
-        "travel": [
-            {
-                title: "flight to italy",
-                departure_date: "2022-06-20T04:48",
-                arrival_date: "2022-06-20T16:48",
-                departure_location: "chicago",
-                arrival_location: "rome"
+    let stays = [
+        {
+            title: "Rome airbnb",
+            start: "2022-06-20T02:00",
+            end: "2022-06-23T11:00",
+            location: "rome"
+        },
+        {
+            title: "Tuscany airbnb",
+            start: "2022-06-23T02:00",
+            end: "2022-06-28T11:00",
+            location: "reitine"
+        },
+        {
+            title: "Naples airbnb",
+            start: "2022-06-28T02:00",
+            end: "2022-06-30T11:00",
+            location: "naples"
+        },
+        {
+            title: "Praiano airbnb",
+            start: "2022-06-30T02:00",
+            end: "2022-07-04T11:00",
+            location: "praiano"
+        },
+        {
+            title: "second Rome airbnb",
+            start: "2022-07-04T02:00",
+            end: "2022-07-05T11:00",
+            location: "rome"
+        }
+    ];
+    let travel = [
+        {
+            title: "flight to italy",
+            start: "2022-06-20T04:48",
+            end: "2022-06-20T16:48",
+            departure_location: "chicago",
+            arrival_location: "rome"
 
-            },
-            {
-                title: "flight home from italy",
-                departure_date: "2022-07-05T04:48",
-                arrival_date: "2022-07-05T16:48",
-                departure_location: "Rome",
-                arrival_location: "Chicago"
-            },
-            {
-                title: "train to florence",
-                departure_date: "2022-06-23T08:48",
-                arrival_date: "2022-06-23T11:48",
-                departure_location: "Rome",
-                arrival_location: "florence"
-            },
-            {
-                title: "rental car to rietine",
-                departure_date: "2022-06-23T13:48",
-                arrival_date: "2022-06-23T14:48",
-                departure_location: "florence",
-                arrival_location: "rietine"
-            },
-            {
-                title: "rental car to rome",
-                departure_date: "2022-06-28T08:48",
-                arrival_date: "2022-06-28T11:48",
-                departure_location: "rietine",
-                arrival_location: "rome"
-            },
-            {
-                title: "train to naples",
-                departure_date: "2022-06-28T13:48",
-                arrival_date: "2022-06-28T17:48",
-                departure_location: "rome",
-                arrival_location: "naplese"
-            },
-            {
-                title: "train to solerno",
-                departure_date: "2022-06-30T08:48",
-                arrival_date: "2022-06-30T11:48",
-                departure_location: "naples",
-                arrival_location: "solerno"
-            },
-            {
-                title: "bus to praiano",
-                departure_date: "2022-06-30T12:48",
-                arrival_date: "2022-06-30T14:48",
-                departure_location: "solerno",
-                arrival_location: "praiano"
-            },
-            {
-                title: "bus to solerno",
-                departure_date: "2022-07-04T07:48",
-                arrival_date: "2022-07-04T09:48",
-                departure_location: "praiano",
-                arrival_location: "solerno"
-            },
-            {
-                title: "train to Rome",
-                departure_date: "2022-07-05T10:48",
-                arrival_date: "2022-07-05T15:48",
-                departure_location: "solerno",
-                arrival_location: "rome"
-            }
-        ],
-        "stays": [
-            {
-                title: "Rome airbnb",
-                checkin_date: "2022-06-20T02:00",
-                checkout_date: "2022-06-23T11:00",
-                city: "rome"
-            },
-            {
-                title: "Tuscany airbnb",
-                checkin_date: "2022-06-23T02:00",
-                checkout_date: "2022-06-28T11:00",
-                city: "reitine"
-            },
-            {
-                title: "Naples airbnb",
-                checkin_date: "2022-06-28T02:00",
-                checkout_date: "2022-06-30T11:00",
-                city: "naples"
-            },
-            {
-                title: "Praiano airbnb",
-                checkin_date: "2022-06-30T02:00",
-                checkout_date: "2022-07-04T11:00",
-                city: "praiano"
-            },
-            {
-                title: "second Rome airbnb",
-                checkin_date: "2022-07-04T02:00",
-                checkout_date: "2022-07-05T11:00",
-                city: "rome"
-            }
-        ],
-        "activities": []
-    };
-
-
-    //for testing
-    // entries = [{}];
+        },
+        {
+            title: "flight home from italy",
+            start: "2022-07-05T04:48",
+            end: "2022-07-05T16:48",
+            departure_location: "Rome",
+            arrival_location: "Chicago"
+        },
+        {
+            title: "train to florence",
+            start: "2022-06-23T08:48",
+            end: "2022-06-23T11:48",
+            departure_location: "Rome",
+            arrival_location: "florence"
+        },
+        {
+            title: "rental car to rietine",
+            start: "2022-06-23T13:48",
+            end: "2022-06-23T14:48",
+            departure_location: "florence",
+            arrival_location: "rietine"
+        },
+        {
+            title: "rental car to rome",
+            start: "2022-06-28T08:48",
+            end: "2022-06-28T11:48",
+            departure_location: "rietine",
+            arrival_location: "rome"
+        },
+        {
+            title: "train to naples",
+            start: "2022-06-28T13:48",
+            end: "2022-06-28T17:48",
+            departure_location: "rome",
+            arrival_location: "naplese"
+        },
+        {
+            title: "train to solerno",
+            start: "2022-06-30T08:48",
+            end: "2022-06-30T11:48",
+            departure_location: "naples",
+            arrival_location: "solerno"
+        },
+        {
+            title: "bus to praiano",
+            start: "2022-06-30T12:48",
+            end: "2022-06-30T14:48",
+            departure_location: "solerno",
+            arrival_location: "praiano"
+        },
+        {
+            title: "bus to solerno",
+            start: "2022-07-04T07:48",
+            end: "2022-07-04T09:48",
+            departure_location: "praiano",
+            arrival_location: "solerno"
+        },
+        {
+            title: "train to Rome",
+            start: "2022-07-05T10:48",
+            end: "2022-07-05T15:48",
+            departure_location: "solerno",
+            arrival_location: "rome"
+        }
+    ];
+    let activities = [];
 
 
 
@@ -154,7 +145,10 @@ import { check_outros } from "svelte/internal";
     let curr_type = entry_types[0];
     let trip_days = (new Date(trip_config.return_date.value).getTime() - new Date(trip_config.start_date.value).getTime())/(1000*60*60*24);
     let calender_title = `Your ${trip_days} days trip`;
-    export let input_data;
+    export /**
+            * @type {{ [x: string]: any; input_data: any; }}
+            */
+     let input_data;
     input_data = input_data.input_data;
     input_data = input_data;
     
@@ -181,8 +175,12 @@ import { check_outros } from "svelte/internal";
             element.value = "";
             });
             if (!is_config){
-                if (curr_type == 'activity') entries.activities.push(result);
-                // entries = entries;
+
+                //todo all other entry types trqvel ant stay
+                if (curr_type == 'activity'){
+                    activities.push(result);
+                    activities = activities;
+                }
             }
             
            
@@ -196,26 +194,35 @@ import { check_outros } from "svelte/internal";
         let result = [];
         let day_to_return = daysIntoYear(trip_config.start_date.value) + day_index + 1;
         entries?.forEach(element => {
-            let start = daysIntoYear(element.departure_date ? element.departure_date : element.checkin_date);
-            let end = daysIntoYear(element.arrival_date ? element.arrival_date : element.checkout_date);
+            let start = daysIntoYear(element.start);
+            let end = daysIntoYear(element.end);
             if (    (start == day_to_return && end == day_to_return) ||
                     (start <= day_to_return && end >= day_to_return)){
                 let temp_date = "";
-                if (start == day_to_return) temp_date = element.departure_date ? element.departure_date : `check-in: ${new Date(element.checkin_date).getHours()}:${new Date(element.checkin_date).getMinutes()}`;
-                if (end == day_to_return && !temp_date) temp_date = element.arrival_date ? element.arrival_date : `check-out: ${new Date(element.checkout_date).getHours()}:${new Date(element.checkout_date).getMinutes()}`;
-                else if (end == day_to_return && temp_date && element.departure_date) temp_date = `depart: ${new Date(element.departure_date).getHours()}:${new Date(element.departure_date).getMinutes()} arrive: ${new Date(element.arrival_date).getHours()}:${new Date(element.arrival_date).getMinutes()}`;
-                let temp_city = element.city ? element.city : `${element.departure_location} -> ${element.arrival_location}`;
+                if (curr_type == 'stay'){
+                    if (start == day_to_return) {
+                            temp_date = `check-in: ${new Date(element.start).getHours()}:${new Date(element.start).getMinutes()}`;
+                    }else if (end == day_to_return){
+                            temp_date = `check-out: ${new Date(element.end).getHours()}:${new Date(element.end).getMinutes()}`;
+                    }
+                } else if (curr_type == 'travel'){
+                    temp_date = `depart: ${new Date(element.start).getHours()}:${new Date(element.start).getMinutes()} arrive: ${new Date(element.end).getHours()}:${new Date(element.end).getMinutes()}`;
+                }else {
+                    temp_date = `start: ${new Date(element.start).getHours()}:${new Date(element.start).getMinutes()} end: ${new Date(element.end).getHours()}:${new Date(element.end).getMinutes()}`;
+                }
+
+                let temp_location = element.location ? element.location : `${element.departure_location} -> ${element.arrival_location}`;
                 let temp;
                 if (temp_date != "") {
                     temp = {
                         title: element.title,
                         date: temp_date,
-                        city: temp_city
+                        location: temp_location
                     }
                 }else {
                     temp = {
                         title: element.title,
-                        city: temp_city
+                        location: temp_location
                     }
                 }
                 result.push(temp);
@@ -245,11 +252,13 @@ import { check_outros } from "svelte/internal";
             {#each Array(trip_days) as _, i}
                 <div class="day">
                     <div class="stay" id="stay-{i}">
-                            {#each get_entries_for_the_day(i, entries.stays) as {title, city, date}}
-                                <div class="card_text"><p>{title}</p><p>{city}</p>
+                        {#if get_entries_for_the_day(i, stays).length}
+                            {#each get_entries_for_the_day(i, stays) as {title, location, date}}
+                                <div class="card_text"><p>{title}</p><p>{location}</p>
                                     {#if date}<p>{date}</p>{/if}
                                 </div>
                             {/each}
+                        {/if}
                     </div>
                 </div>
             {/each}
@@ -258,9 +267,9 @@ import { check_outros } from "svelte/internal";
             {#each Array(trip_days) as _, i}
                 <div class="day">
                     <div class="activities" id="activity-{i}">
-                        {#if get_entries_for_the_day(i, entries.activities).length}
-                            {#each get_entries_for_the_day(i, entries.activities) as {title, city, date}}
-                                <div class="card_text"><p>{title}</p><p>{city}</p>
+                        {#if get_entries_for_the_day(i, activities).length}
+                            {#each get_entries_for_the_day(i, activities) as {title, location, date}}
+                                <div class="card_text"><p>{title}</p><p>{location}</p>
                                     {#if date}<p>{date}</p>{/if}
                                 </div>
                             {/each}
@@ -276,9 +285,9 @@ import { check_outros } from "svelte/internal";
             {#each Array(trip_days) as _, i}
                 <div class="day">
                     <div class="travel" id="travel-{i}">
-                        {#if get_entries_for_the_day(i, entries.travel).length}
-                            {#each get_entries_for_the_day(i, entries.travel) as {title, city, date}}
-                                <div class="card_text"><p>{title}</p><p>{city}</p>
+                        {#if get_entries_for_the_day(i, travel).length}
+                            {#each get_entries_for_the_day(i, travel) as {title, location, date}}
+                                <div class="card_text"><p>{title}</p><p>{location}</p>
                                     {#if date}<p>{date}</p>{/if}
                                 </div>
                             {/each}
