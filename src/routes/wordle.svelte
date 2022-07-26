@@ -5,7 +5,7 @@
     export async function load({ fetch }) {
       const url = `/apis/get_possible_words`;
       const response = await fetch(url);
-  
+        // console.log(response.body);
       return {
         status: response.status,
         props: {
