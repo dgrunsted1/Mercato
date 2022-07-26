@@ -2,7 +2,6 @@
     export async function load({ fetch }) {
       const url = `/apis/get_itinerary_data`;
       const response = await fetch(url);
-  
       return {
         status: response.status,
         props: {
@@ -29,39 +28,46 @@
         start_location: {value: "Milwaukee, WI, USA", type:"text"}
     }
 
-
     
     let entry_types = [ 'travel', 'activity', 'stay'];
+    let curr_type = entry_types[0];
+    let trip_days = (new Date(trip_config.return_date.value).getTime() - new Date(trip_config.start_date.value).getTime())/(1000*60*60*24);
+    let show_cronological = true;
     let stays = [
         {
             title: "Rome airbnb",
             start: "2022-06-20T02:00",
             end: "2022-06-23T11:00",
-            location: "rome"
+            location: "rome",
+            type: "stay"
         },
         {
             title: "Tuscany airbnb",
             start: "2022-06-23T02:00",
             end: "2022-06-28T11:00",
-            location: "reitine"
+            location: "reitine",
+            type: "stay"
         },
         {
             title: "Naples airbnb",
             start: "2022-06-28T02:00",
             end: "2022-06-30T11:00",
-            location: "naples"
+            location: "naples",
+            type: "stay"
         },
         {
             title: "Praiano airbnb",
             start: "2022-06-30T02:00",
             end: "2022-07-04T11:00",
-            location: "praiano"
+            location: "praiano",
+            type: "stay"
         },
         {
             title: "second Rome airbnb",
             start: "2022-07-04T02:00",
             end: "2022-07-05T11:00",
-            location: "rome"
+            location: "rome",
+            type: "stay"
         }
     ];
     let travel = [
@@ -70,7 +76,8 @@
             start: "2022-06-20T04:48",
             end: "2022-06-20T16:48",
             departure_location: "chicago",
-            arrival_location: "rome"
+            arrival_location: "rome",
+            type: "activity"
 
         },
         {
@@ -78,72 +85,106 @@
             start: "2022-07-05T04:48",
             end: "2022-07-05T16:48",
             departure_location: "Rome",
-            arrival_location: "Chicago"
+            arrival_location: "Chicago",
+            type: "activity"
         },
         {
             title: "train to florence",
             start: "2022-06-23T08:48",
             end: "2022-06-23T11:48",
             departure_location: "Rome",
-            arrival_location: "florence"
+            arrival_location: "florence",
+            type: "activity"
         },
         {
             title: "rental car to rietine",
             start: "2022-06-23T13:48",
             end: "2022-06-23T14:48",
             departure_location: "florence",
-            arrival_location: "rietine"
+            arrival_location: "rietine",
+            type: "activity"
         },
         {
             title: "rental car to rome",
             start: "2022-06-28T08:48",
             end: "2022-06-28T11:48",
             departure_location: "rietine",
-            arrival_location: "rome"
+            arrival_location: "rome",
+            type: "activity"
         },
         {
             title: "train to naples",
             start: "2022-06-28T13:48",
             end: "2022-06-28T17:48",
             departure_location: "rome",
-            arrival_location: "naplese"
+            arrival_location: "naplese",
+            type: "activity"
         },
         {
             title: "train to solerno",
             start: "2022-06-30T08:48",
             end: "2022-06-30T11:48",
             departure_location: "naples",
-            arrival_location: "solerno"
+            arrival_location: "solerno",
+            type: "activity"
         },
         {
             title: "bus to praiano",
             start: "2022-06-30T12:48",
             end: "2022-06-30T14:48",
             departure_location: "solerno",
-            arrival_location: "praiano"
+            arrival_location: "praiano",
+            type: "activity"
         },
         {
             title: "bus to solerno",
             start: "2022-07-04T07:48",
             end: "2022-07-04T09:48",
             departure_location: "praiano",
-            arrival_location: "solerno"
+            arrival_location: "solerno",
+            type: "activity"
         },
         {
             title: "train to Rome",
             start: "2022-07-05T10:48",
             end: "2022-07-05T15:48",
             departure_location: "solerno",
-            arrival_location: "rome"
+            arrival_location: "rome",
+            type: "activity"
         }
     ];
     let activities = [];
+    
+    const get_cronological = () => {
+        let result = [...travel, ...activities];
+        let entries_cronological = [];
+        for (let i=0; i<trip_days; i++){
+            let day_start = new Date(trip_config.start_date.value);
+            day_start.setDate(day_start.getDate() + i);
+
+            let event_exists = false;
+            let temp_cronological = [];
+            result.forEach(element => {
+                if (new Date(element.start).toDateString() == day_start.toDateString()){
+                    event_exists = true;
+                    temp_cronological.push(element);
+                }
+            });
+
+            temp_cronological = temp_cronological.sort(function(a,b){
+                return (new Date(b.start) - new Date(a.start));
+            });
+
+            entries_cronological.push(temp_cronological);
+        }
+        return entries_cronological;
+    }
+
+    let cronological = get_cronological();
 
 
 
-
-    let curr_type = entry_types[0];
-    let trip_days = (new Date(trip_config.return_date.value).getTime() - new Date(trip_config.start_date.value).getTime())/(1000*60*60*24);
+    
     let calender_title = `Your ${trip_days} days trip`;
     export /**
             * @type {{ [x: string]: any; input_data: any; }}
@@ -235,6 +276,8 @@
         date = new Date(date);
         return (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 24 / 60 / 60 / 1000;
     }
+
+    
     
     </script>
     
@@ -263,6 +306,11 @@
                 </div>
             {/each}
         </div>
+
+
+
+
+        {#if !show_cronological}
         <div class="row activities">
             {#each Array(trip_days) as _, i}
                 <div class="day">
@@ -299,7 +347,15 @@
                 </div>
             {/each}
         </div>
-            
+        {:else}
+        <div class="row">
+            {#each cronological as day}
+            <div class="day">
+                
+            </div>
+            {/each}
+        </div>
+        {/if}
     
         <div id="new_entry_container">
             

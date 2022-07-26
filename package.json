@@ -26,5 +26,8 @@
 		"svelte-check": "^2.7.1",
 		"typescript": "^4.7.2"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"mysql2": "^2.3.3"
+	}
 }
