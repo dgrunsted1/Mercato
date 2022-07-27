@@ -5,7 +5,6 @@
     export async function load({ fetch }) {
       const url = `/apis/get_possible_words`;
       const response = await fetch(url);
-        // console.log(response.body);
       return {
         status: response.status,
         props: {
@@ -13,7 +12,7 @@
         }
       };
     }
-  </script>
+</script>
 
 
 
@@ -32,8 +31,28 @@
         let grey_letters = [''];
         let yellow_letters = [''];
         let green_letters = [''];
+        let word_to_add = "";    
     
-    
+        let add_word = async function(word_in) {
+            if (word_in.length == 5){
+                const url = '/apis/add_word';
+                const response = await fetch(url, {
+                    method: "post",
+                    body: JSON.stringify({
+                        word: word_in
+                    })
+                });
+                if (response.ok) {
+                    alert(`${word_to_add} added to word list!`);
+                } else {
+                    alert("word exists" + response.status);
+                }
+            }else {
+                alert("word is not 5 letters");
+            }
+            
+            word_to_add = "";
+        }
         let getNext = function(row, column){
             let row_items = document.getElementsByClassName(row);
             let result;
@@ -176,7 +195,7 @@
             if (first_element) first_element.focus();
         });
     
-    </script>
+</script>
     
     
     
@@ -225,6 +244,12 @@
                         {/each}
                     </ul>
                 </div>
+            </div>
+
+            <div id="add_word">
+                <label for="add_word">missing word?</label>
+                <input type="text" bind:value={word_to_add} id="add_word_input" name="add_word">
+                <input type="submit" value="add word" on:click={add_word(word_to_add)}>
             </div>
     
     
@@ -292,5 +317,19 @@
         }
         #grey_letters {
             background-color: #cccccc;
+        }
+
+        #add_word > input[type='text'] {
+            width: 130px;
+            margin: 5px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        #add_word > input[type='submit'] {
+            width: 80px;
+            margin: 5px;
+            text-align: center;
+            font-size: 16px;
         }
     </style>

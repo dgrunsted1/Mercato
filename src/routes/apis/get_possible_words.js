@@ -12,7 +12,6 @@ export async function get(){
     for (let i = 0; i < results.length; i++){
         possible_answers.push(results[i].word);
     }
-    console.log({possible_answers});
     return {
         body: { possible_answers }
     };
