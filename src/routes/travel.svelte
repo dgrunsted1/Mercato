@@ -279,7 +279,7 @@
 
     
     
-    </script>
+</script>
     
     <div id="main_container">
         <div id="visual"></div>
@@ -390,7 +390,7 @@
     
     
     
-    <style>
+<style>
     
     #main_container {
         display: flex;
@@ -515,4 +515,4 @@
             width: 200px;
         }
     }
-    </style>
+</style>
