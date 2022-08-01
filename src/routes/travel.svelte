@@ -11,6 +11,9 @@
     }
   </script>
 <script>
+import { compute_slots } from "svelte/internal";
+
+
 
     let trip_config = {
         default: {value: true, type:"none"}, 
@@ -23,8 +26,8 @@
     // for testing
     trip_config = {
         default: {value: false, type:"none"}, 
-        start_date: {value: "2022-06-20", type:"date"}, 
-        return_date: {value: "2022-07-05", type:"date"}, 
+        start_date: {value: "2022-07-20", type:"date"}, 
+        return_date: {value: "2022-08-05", type:"date"}, 
         start_location: {value: "Milwaukee, WI, USA", type:"text"}
     }
 
@@ -32,49 +35,54 @@
     let entry_types = [ 'travel', 'activity', 'stay'];
     let curr_type = entry_types[0];
     let trip_days = (new Date(trip_config.return_date.value).getTime() - new Date(trip_config.start_date.value).getTime())/(1000*60*60*24);
-    let show_cronological = true;
+    let show_cronological = false;
     let stays = [
         {
             title: "Rome airbnb",
-            start: "2022-06-20T02:00",
-            end: "2022-06-23T11:00",
-            location: "rome",
+            start_date: "2022-07-20T02:00",
+            end_date: "2022-07-23T11:00",
+            departure_location: "Rome",
+            arrival_location: "Rome",
             type: "stay"
         },
         {
             title: "Tuscany airbnb",
-            start: "2022-06-23T02:00",
-            end: "2022-06-28T11:00",
-            location: "reitine",
+            start_date: "2022-07-23T02:00",
+            end_date: "2022-07-28T11:00",
+            departure_location: "Tuscany",
+            arrival_location: "Tuscany",
             type: "stay"
         },
         {
             title: "Naples airbnb",
-            start: "2022-06-28T02:00",
-            end: "2022-06-30T11:00",
-            location: "naples",
+            start_date: "2022-07-28T02:00",
+            end_date: "2022-07-30T11:00",
+            departure_location: "Naples",
+            arrival_location: "Naples",
             type: "stay"
         },
         {
             title: "Praiano airbnb",
-            start: "2022-06-30T02:00",
-            end: "2022-07-04T11:00",
-            location: "praiano",
+            start_date: "2022-07-30T02:00",
+            end_date: "2022-08-04T11:00",
+            departure_location: "Praiano",
+            arrival_location: "Praiano",
             type: "stay"
         },
         {
             title: "second Rome airbnb",
-            start: "2022-07-04T02:00",
-            end: "2022-07-05T11:00",
-            location: "rome",
+            start_date: "2022-08-04T02:00",
+            end_date: "2022-08-05T11:00",
+            departure_location: "Rome",
+            arrival_location: "Rome",
             type: "stay"
         }
     ];
     let travel = [
         {
             title: "flight to italy",
-            start: "2022-06-20T04:48",
-            end: "2022-06-20T16:48",
+            start_date: "2022-07-20T04:48",
+            end_date: "2022-07-20T16:48",
             departure_location: "chicago",
             arrival_location: "rome",
             type: "activity"
@@ -82,78 +90,79 @@
         },
         {
             title: "flight home from italy",
-            start: "2022-07-05T04:48",
-            end: "2022-07-05T16:48",
+            start_date: "2022-08-05T04:48",
+            end_date: "2022-08-05T16:48",
             departure_location: "Rome",
             arrival_location: "Chicago",
             type: "activity"
         },
         {
             title: "train to florence",
-            start: "2022-06-23T08:48",
-            end: "2022-06-23T11:48",
+            start_date: "2022-07-23T08:48",
+            end_date: "2022-07-23T11:48",
             departure_location: "Rome",
             arrival_location: "florence",
             type: "activity"
         },
         {
             title: "rental car to rietine",
-            start: "2022-06-23T13:48",
-            end: "2022-06-23T14:48",
+            start_date: "2022-07-23T13:48",
+            end_date: "2022-07-23T14:48",
             departure_location: "florence",
             arrival_location: "rietine",
             type: "activity"
         },
         {
             title: "rental car to rome",
-            start: "2022-06-28T08:48",
-            end: "2022-06-28T11:48",
+            start_date: "2022-07-28T08:48",
+            end_date: "2022-07-28T11:48",
             departure_location: "rietine",
             arrival_location: "rome",
             type: "activity"
         },
         {
             title: "train to naples",
-            start: "2022-06-28T13:48",
-            end: "2022-06-28T17:48",
+            start_date: "2022-07-28T13:48",
+            end_date: "2022-07-28T17:48",
             departure_location: "rome",
             arrival_location: "naplese",
             type: "activity"
         },
         {
             title: "train to solerno",
-            start: "2022-06-30T08:48",
-            end: "2022-06-30T11:48",
+            start_date: "2022-07-30T08:48",
+            end_date: "2022-07-30T11:48",
             departure_location: "naples",
             arrival_location: "solerno",
             type: "activity"
         },
         {
             title: "bus to praiano",
-            start: "2022-06-30T12:48",
-            end: "2022-06-30T14:48",
+            start_date: "2022-07-30T12:48",
+            end_date: "2022-07-30T14:48",
             departure_location: "solerno",
             arrival_location: "praiano",
             type: "activity"
         },
         {
             title: "bus to solerno",
-            start: "2022-07-04T07:48",
-            end: "2022-07-04T09:48",
+            start_date: "2022-08-04T08:48",
+            end_date: "2022-08-04T09:48",
             departure_location: "praiano",
             arrival_location: "solerno",
             type: "activity"
         },
         {
             title: "train to Rome",
-            start: "2022-07-05T10:48",
-            end: "2022-07-05T15:48",
+            start_date: "2022-08-05T10:48",
+            end_date: "2022-08-05T15:48",
             departure_location: "solerno",
             arrival_location: "rome",
             type: "activity"
         }
     ];
     let activities = [];
+    
     
     const get_cronological = () => {
         let result = [...travel, ...activities];
@@ -185,7 +194,7 @@
 
 
     
-    let calender_title = `Your ${trip_days} days trip`;
+    let calender_title = `Your ${trip_days} day trip`;
     export /**
             * @type {{ [x: string]: any; input_data: any; }}
             */
@@ -195,32 +204,46 @@
     
     const add_entry = () => {
         let vals = document.getElementsByTagName('input');
+        // console.log({vals});
         let result = {};
-        let vals_exist = true;
+        let vals_exist = false;
         let is_config = false;
         [...vals].forEach(element => {
-            if (!element.value) vals_exist = false;
-            if (element.name == 'start_location' && element.value != '' ) {
-                trip_config.default.value = false;
-                is_config = true;
+            // console.log(`value=${element.value}`);
+            // console.log(`name=${element.name}`);
+            if (element.value) {
+                vals_exist = true;
+                if (element.name == 'start_location' && element.value != '' ) {
+                    trip_config.default.value = false;
+                    is_config = true;
+                }
+                if (element.name == "start_date") trip_config.start_date.value = element.value;
+                if (element.name == "end_date") trip_config.return_date.value = element.value;
+                if (element.name == "start_location") trip_config.start_location.value = element.value;
+                if (element.name) result[element.name] = element.value;
             }
-            if (element.name == "start_date") trip_config.start_date.value = element.value;
-            if (element.name == "return_date") trip_config.return_date.value = element.value;
-            if (element.name == "start_location") trip_config.start_location.value = element.value;
-            result[element.name] = element.value;
-            
         });
-
-        if (vals_exist) {
+        // console.log({result});
+        if (result) {
+            // @ts-ignore
             [...vals].forEach(element => {
             element.value = "";
             });
-            if (!is_config){
+            if (!is_config) {
 
-                //todo all other entry types trqvel ant stay
+                //todo all other entry types trAvel anD stay
                 if (curr_type == 'activity'){
                     activities.push(result);
                     activities = activities;
+                    // console.log({activities});
+                }else if (curr_type == 'travel'){
+                    travel.push(result);
+                    travel = travel;
+                    // console.log({travel});
+                }else if (curr_type == 'stay'){
+                    stays.push(result);
+                    stays = stays;
+                    // console.log({stays});
                 }
             }
             
@@ -228,31 +251,31 @@
         }else {
             alert("missing value");
         }
-        console.log(entries.activities);
     }
 
     const get_entries_for_the_day = (day_index, entries) => {
+        // console.log({day_index, entries});
         let result = [];
         let day_to_return = daysIntoYear(trip_config.start_date.value) + day_index + 1;
         entries?.forEach(element => {
-            let start = daysIntoYear(element.start);
-            let end = daysIntoYear(element.end);
+            let start = daysIntoYear(element.start_date);
+            let end = daysIntoYear(element.end_date);
             if (    (start == day_to_return && end == day_to_return) ||
                     (start <= day_to_return && end >= day_to_return)){
                 let temp_date = "";
-                if (curr_type == 'stay'){
+                if (element.type == 'stay'){
                     if (start == day_to_return) {
-                            temp_date = `check-in: ${new Date(element.start).getHours()}:${new Date(element.start).getMinutes()}`;
+                            temp_date = `check-in: ${new Date(element.start_date).getHours()}:${new Date(element.start_date).getMinutes()}`;
                     }else if (end == day_to_return){
-                            temp_date = `check-out: ${new Date(element.end).getHours()}:${new Date(element.end).getMinutes()}`;
+                            temp_date = `check-out: ${new Date(element.end_date).getHours()}:${new Date(element.end_date).getMinutes()}`;
                     }
-                } else if (curr_type == 'travel'){
-                    temp_date = `depart: ${new Date(element.start).getHours()}:${new Date(element.start).getMinutes()} arrive: ${new Date(element.end).getHours()}:${new Date(element.end).getMinutes()}`;
+                } else if (element.type == 'travel'){
+                    temp_date = `depart: ${new Date(element.start_date).getHours()}:${new Date(element.start_date).getMinutes()} arrive: ${new Date(element.end_date).getHours()}:${new Date(element.end_date).getMinutes()}`;
                 }else {
-                    temp_date = `start: ${new Date(element.start).getHours()}:${new Date(element.start).getMinutes()} end: ${new Date(element.end).getHours()}:${new Date(element.end).getMinutes()}`;
+                    temp_date = `start: ${new Date(element.start_date).getHours()}:${new Date(element.start_date).getMinutes()} end: ${new Date(element.end_date).getHours()}:${new Date(element.end_date).getMinutes()}`;
                 }
 
-                let temp_location = element.location ? element.location : `${element.departure_location} -> ${element.arrival_location}`;
+                let temp_location = (element.departure_location == element.arrival_location) ? `location: ${element.arrival_location}` : `${element.departure_location} -> ${element.arrival_location}`;
                 let temp;
                 if (temp_date != "") {
                     temp = {
@@ -269,6 +292,7 @@
                 result.push(temp);
             }
         });
+        // console.log({result});
         return result;
     }
 
@@ -282,6 +306,7 @@
 </script>
     
     <div id="main_container">
+        <dive id="title"><h1>{calender_title}</h1></dive>
         <div id="visual"></div>
         <div class="row">
             {#each Array(trip_days) as _, i}
@@ -311,50 +336,50 @@
 
 
         {#if !show_cronological}
-        <div class="row activities">
-            {#each Array(trip_days) as _, i}
-                <div class="day">
-                    <div class="activities" id="activity-{i}">
-                        {#if get_entries_for_the_day(i, activities).length}
-                            {#each get_entries_for_the_day(i, activities) as {title, location, date}}
-                                <div class="card_text"><p>{title}</p><p>{location}</p>
-                                    {#if date}<p>{date}</p>{/if}
+            <div class="row activities">
+                {#each Array(trip_days) as _, i}
+                    <div class="day">
+                        <div class="activities" id="activity-{i}">
+                            {#if get_entries_for_the_day(i, activities).length}
+                                {#each get_entries_for_the_day(i, activities) as {title, location, date}}
+                                    <div class="card_text"><p>{title}</p><p>{location}</p>
+                                        {#if date}<p>{date}</p>{/if}
+                                    </div>
+                                {/each}
+                            {:else}
+                                <div class="card_text"><p>no activities today</p>
                                 </div>
-                            {/each}
-                        {:else}
-                            <div class="card_text"><p>no activities today</p>
-                            </div>
-                        {/if}
-                    </div>
-                </div>
-            {/each}
-        </div>
-        <div class="row travel">
-            {#each Array(trip_days) as _, i}
-                <div class="day">
-                    <div class="travel" id="travel-{i}">
-                        {#if get_entries_for_the_day(i, travel).length}
-                            {#each get_entries_for_the_day(i, travel) as {title, location, date}}
-                                <div class="card_text"><p>{title}</p><p>{location}</p>
-                                    {#if date}<p>{date}</p>{/if}
-                                </div>
-                            {/each}
-                        {:else}
-                        <div class="card_text"><p>no travel today</p>
+                            {/if}
                         </div>
-                        {/if}
                     </div>
-                </div>
-            {/each}
-        </div>
-        {:else}
-        <div class="row">
-            {#each cronological as day}
-            <div class="day">
-                
+                {/each}
             </div>
-            {/each}
-        </div>
+            <div class="row travel">
+                {#each Array(trip_days) as _, i}
+                    <div class="day">
+                        <div class="travel" id="travel-{i}">
+                            {#if get_entries_for_the_day(i, travel).length}
+                                {#each get_entries_for_the_day(i, travel) as {title, location, date}}
+                                    <div class="card_text"><p>{title}</p><p>{location}</p>
+                                        {#if date}<p>{date}</p>{/if}
+                                    </div>
+                                {/each}
+                            {:else}
+                            <div class="card_text"><p>no travel today</p>
+                            </div>
+                            {/if}
+                        </div>
+                    </div>
+                {/each}
+            </div>
+        {:else}
+            <div class="row">
+                {#each cronological as day}
+                <div class="day">
+                    
+                </div>
+                {/each}
+            </div>
         {/if}
     
         <div id="new_entry_container">
@@ -404,10 +429,10 @@
         flex-wrap: wrap;
     }
     
-    .entry_container {
+    /* .entry_container {
         display: flex;
         flex-direction: column;
-    }
+    } */
     
     #new_entry_container {
         /* max-width: 600px; */
