@@ -36,48 +36,64 @@ import { compute_slots } from "svelte/internal";
     let curr_type = entry_types[0];
     let trip_days = (new Date(trip_config.return_date.value).getTime() - new Date(trip_config.start_date.value).getTime())/(1000*60*60*24);
     let show_cronological = false;
-    let stays = [
-        {
-            title: "Rome airbnb",
-            start_date: "2022-07-20T02:00",
-            end_date: "2022-07-23T11:00",
-            departure_location: "Rome",
-            arrival_location: "Rome",
-            type: "stay"
-        },
-        {
-            title: "Tuscany airbnb",
-            start_date: "2022-07-23T02:00",
-            end_date: "2022-07-28T11:00",
-            departure_location: "Tuscany",
-            arrival_location: "Tuscany",
-            type: "stay"
-        },
-        {
-            title: "Naples airbnb",
-            start_date: "2022-07-28T02:00",
-            end_date: "2022-07-30T11:00",
-            departure_location: "Naples",
-            arrival_location: "Naples",
-            type: "stay"
-        },
-        {
-            title: "Praiano airbnb",
-            start_date: "2022-07-30T02:00",
-            end_date: "2022-08-04T11:00",
-            departure_location: "Praiano",
-            arrival_location: "Praiano",
-            type: "stay"
-        },
-        {
-            title: "second Rome airbnb",
-            start_date: "2022-08-04T02:00",
-            end_date: "2022-08-05T11:00",
-            departure_location: "Rome",
-            arrival_location: "Rome",
-            type: "stay"
+    // let stays = [
+    //     {
+    //         title: "Rome airbnb",
+    //         start_date: "2022-07-20T02:00",
+    //         end_date: "2022-07-23T11:00",
+    //         departure_location: "Rome",
+    //         arrival_location: "Rome",
+    //         type: "stay"
+    //     },
+    //     {
+    //         title: "Tuscany airbnb",
+    //         start_date: "2022-07-23T02:00",
+    //         end_date: "2022-07-28T11:00",
+    //         departure_location: "Tuscany",
+    //         arrival_location: "Tuscany",
+    //         type: "stay"
+    //     },
+    //     {
+    //         title: "Naples airbnb",
+    //         start_date: "2022-07-28T02:00",
+    //         end_date: "2022-07-30T11:00",
+    //         departure_location: "Naples",
+    //         arrival_location: "Naples",
+    //         type: "stay"
+    //     },
+    //     {
+    //         title: "Praiano airbnb",
+    //         start_date: "2022-07-30T02:00",
+    //         end_date: "2022-08-04T11:00",
+    //         departure_location: "Praiano",
+    //         arrival_location: "Praiano",
+    //         type: "stay"
+    //     },
+    //     {
+    //         title: "second Rome airbnb",
+    //         start_date: "2022-08-04T02:00",
+    //         end_date: "2022-08-05T11:00",
+    //         departure_location: "Rome",
+    //         arrival_location: "Rome",
+    //         type: "stay"
+    //     }
+    // ];
+
+    async function get_stays(type_in) {
+      const url = `/apis/get_stays/${type_in}`;
+      const response = await fetch(url);
+      return {
+        status: response.status,
+        props: {
+            stays: response.ok && (await response.json())
         }
-    ];
+      };
+    }
+
+
+    let stays = get_stays('activities');
+
+
     let travel = [
         {
             title: "flight to italy",
@@ -245,6 +261,7 @@ import { compute_slots } from "svelte/internal";
                     stays = stays;
                     // console.log({stays});
                 }
+                
             }
             
            
@@ -255,9 +272,10 @@ import { compute_slots } from "svelte/internal";
 
     const get_entries_for_the_day = (day_index, entries) => {
         // console.log({day_index, entries});
+        if (!entries) return false;
         let result = [];
         let day_to_return = daysIntoYear(trip_config.start_date.value) + day_index + 1;
-        entries?.forEach(element => {
+        entries.forEach(element => {
             let start = daysIntoYear(element.start_date);
             let end = daysIntoYear(element.end_date);
             if (    (start == day_to_return && end == day_to_return) ||
