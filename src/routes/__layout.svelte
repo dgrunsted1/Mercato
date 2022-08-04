@@ -1,7 +1,7 @@
 <script>
 import Header from '../lib/components/header.svelte';
 import SideBar from '../lib/components/sidebar.svelte';
-let pages = ['wordle', 'travel', 'music', 'sports', 'fashion', 'cooking', 'tech', 'photography'];
+let pages = ['wordle', 'travel', 'music', 'sports', 'fashion', 'cooking', 'do_more', 'photography'];
 </script>
 
 

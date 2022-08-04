@@ -36,7 +36,7 @@
                     <Cooking active={currPage == page}/>
                     {:else if page == 'fashion'}
                     <Clothes active={currPage == page}/>
-                    {:else if page == 'tech'}
+                    {:else if page == 'do_more'}
                     <Laptop active={currPage == page}/>
                     {:else if page == 'music'}
                     <Music active={currPage == page}/>
