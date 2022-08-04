@@ -1,6 +1,6 @@
 <script context="module">
     export async function load({ fetch }) {
-      const url = `/apis/get_itinerary_data`;
+      const url = `/apis/itinerary/get_itinerary_data`;
       const response = await fetch(url);
       return {
         status: response.status,
@@ -80,7 +80,7 @@ import { compute_slots } from "svelte/internal";
     // ];
 
     async function get_stays(type_in) {
-      const url = `/apis/get_stays/${type_in}`;
+      const url = `/apis/itinerary/get_stays/${type_in}`;
       const response = await fetch(url);
       return {
         status: response.status,

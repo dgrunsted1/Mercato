@@ -3,7 +3,7 @@
 <script context="module">
     import { element_is } from "svelte/internal";
     export async function load({ fetch }) {
-      const url = `/apis/get_possible_words`;
+      const url = `/apis/wordle/get_possible_words`;
       const response = await fetch(url);
       return {
         status: response.status,
@@ -35,7 +35,7 @@
     
         let add_word = async function(word_in) {
             if (word_in.length == 5){
-                const url = '/apis/add_word';
+                const url = '/apis/wordle/add_word';
                 const response = await fetch(url, {
                     method: "post",
                     body: JSON.stringify({
