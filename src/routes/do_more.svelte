@@ -1,23 +1,50 @@
+<script context="module">
+    let type = "home";
+    export async function load({ fetch }) {
+        console.log("start load function");
+        const url = `/apis/schedule/get_activity_schedule`;
+        console.log("type");
+        console.log(type);
+        const response = await fetch(url, {
+            method: "post",
+            body: JSON.stringify({
+                type: type,
+                user: 1
+            })
+        });
+        console.log("end load function");
+        return {
+            staus: response.status,
+            props: {
+                events: response.ok && (await response.json())
+            }
+        }
+    }
+</script>
+
+
+
 <script>
-import Schedule from '../lib/components/schedule.svelte';
-import Map from '../lib/components/map.svelte';
-import Chat from '../lib/components/chat.svelte';
-let curr_tabs = ["home", "golf", "beach", "dinner", "brunch", "lunch", "walk", "tennis", "hike", "shop", "eat", "drinks"];
-let curr_tab = "home";
-
-
-
-
+    import { browser } from '$app/env';
+    import Schedule from '../lib/components/schedule.svelte';
+    import Map from '../lib/components/map.svelte';
+    import Chat from '../lib/components/chat.svelte';
+    const curr_tabs = ["home", "golf", "beach", "dinner", "brunch", "lunch", "walk", "tennis", "hike", "shop", "eat", "drinks"];
+    // @ts-ignore
+    export let type;
+    export let events;
+    events = events.events;
+    console.log(events);
+    
 
 </script>
 
 
 <div id="page">
     <div id="content">
-        <h1>{curr_tab}</h1>
+        <h1>{type}</h1>
 
-        <Schedule type={curr_tab}/>
-
+        <Schedule bind:type={type} bind:events={events}/>
         <!-- <Map type={curr_tab}/>
 
         <Chat type={curr_tab}/> -->
@@ -25,7 +52,7 @@ let curr_tab = "home";
 
     <div id="tabs">
         {#each curr_tabs as tab}
-            <div class="tab" on:click={() => {curr_tab = tab;}}>
+            <div class="tab" on:click={() => {type = tab;}}>
                 {tab}
             </div>
         {/each}

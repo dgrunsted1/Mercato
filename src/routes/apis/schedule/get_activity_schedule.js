@@ -1,14 +1,17 @@
 import { mysqlconnFn } from '$lib/components/db';
+import { ExitStatus } from 'typescript';
 
 export const post = async(data) => {
-    console.log("here");
+    console.log("start get_activity_schedule.js");
     let mysqlconn = await mysqlconnFn();
     let events = [];
     let body = await data.request.json();
     let type = body.type;
     let user = 1;
+    let type_where;
+    $: type_where = (type != "home") ? `type = '${type}' AND` :  "";
     let query = `   SELECT 
-                        e.id as id, start_date, end_date, e.descriptionas as event_description, l.name as name, l.address as address, l.coordinates as coords, al.description as location_description
+                        e.id as id, start_date, end_date, e.description as event_description, l.name as name, l.address as address, l.coordinates as coords, al.description as location_description
                     FROM 
                         events as e 
                     JOIN 
@@ -28,18 +31,15 @@ export const post = async(data) => {
                         AND 
                         al.location_id = l.id 
                     WHERE 
-                        activity_id=${type} 
-                        AND 
+                        ${type_where} 
                         user_id=${user}`;
-                        console.log(
-                            query
-                        );
+                        console.log(query);
     let results = await mysqlconn.query(query)
-        .then(function([rows, fields]) {
-            return rows;
+        .then(function([rows, fields, err]) {
+            return (err) ? err : rows;
         });
-
-    for (let i = 0; i < results.length; i++){
+        console.log("40 get_activity_schedule.js");
+        for (let i = 0; i < results.length; i++){
         events.push({
             id: results[i].id,
             start_date: results[i].start_date,
@@ -51,6 +51,8 @@ export const post = async(data) => {
             location_description: results[i].location_description
         });
     }
+    console.log({events});
+    console.log("end get_activity_schedule.js");
     return {
         body: { events }
     };

@@ -1,23 +1,3 @@
-<script context="module">
-    export let type;
-    import { element_is } from "svelte/internal";
-    async function load({ fetch }) {
-        const url = `/../../routes/apis/schedule/get_activity_schedule`;
-        const response = await fetch(url, {
-            method: "post",
-            body: JSON.stringify({
-                type: type
-            })
-        });
-        return {
-            status: response.status,
-            props: {
-            events: response.ok && (await response.json())
-            }
-        };
-    }
-
-</script>
 
 
 
@@ -25,56 +5,52 @@
 
 
 <script>
-    import { browser } from '$app/env';
-export let type;
-
-
-let get_events = async function() {
-    if (browser){
-        const url = '/src/routes/apis/schedule/get_activity_schedule';
-        const response = await fetch(url, {
-            method: "post",
-            body: JSON.stringify({
-                type: type,
-                user: 1
-            })
-        });
-        if (response.ok) {
-            return response
+    console.log("start schedule.svelte");
+    export let type;
+    export let events;    
+    let todays_date = new Date();
+    const get_days_of_week = () => {
+        let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        return days[todays_date.getDay()];
+    }
+    const days = ["Sun","Mon","Tues","Wed","Thur","Fri","Sat"];
+    // console.log({events});
+    const display_day = (day) => {
+        console.log("start display_day");
+        if (day === 0) {
+            console.log("end display_day");
+            return "Today";
         } else {
-            alert("no response from from ../../routes/apis/schedule/get_activity_schedule");
+            var dd = todays_date.getDate();
+            var mm = todays_date.getMonth();
+            var yyyy = todays_date.getFullYear();
+            let curr = new Date(yyyy, mm, dd+day);
+            console.log("end display_day");
+            return `${days[curr.getDay()]} ${curr.getDate()}`;
+            
         }
-    }else {
-        return;
-    }
-    
-}
+    };
 
+    const get_weeks_schedule = (events) => {
+        // let queue = events.sort((a, b) => { a.start_date - b.start_date } );
+        let queue = [];
+        let weeks = [];
+        for (let i = 0; i < 7; i++) {
+            let temp_date_begin = new Date(todays_date.getFullYear(), todays_date.getMonth(), todays_date.getDate()+i);
+            let temp_date_end = new Date(todays_date.getFullYear(), todays_date.getMonth(), todays_date.getDate()+i+1);
+            for (let j = 0; j < queue.length; j++) {
+                if (queue[j].start_date >= temp_date_begin && queue[j].start_date < temp_date_end ||
+                    queue[j].end_date >= temp_date_begin && queue[j].end_date < temp_date_end) {
+                    weeks.push(queue[j]);
+                }else {
 
-let events = get_events();
-console.log(events);
+                }
+            }
+        }
+    };
 
-let todays_date = new Date();
-
-const days = ["Sun","Mon","Tues","Wed","Thur","Fri","Sat"];
-// export let events;
-// console.log({events});
-// events = events.events;
-const display_day = (day) => {
-    if (day === 0) {
-        return "Today";
-    } else {
-        var dd = todays_date.getDate()+day;
-        var mm = todays_date.getMonth();
-        var yyyy = todays_date.getFullYear();
-        let curr = new Date(mm+'/'+dd+'/'+yyyy);
-        return `${days[curr.getDay()]} ${curr.getDate()}`;
-    }
-};
-
-// const add_event = () => {
-    
-// };
+    let weeks_schedule = get_weeks_schedule(events);
+    console.log("end schedule.svelte");
 </script>
 
 <div id="new_entry">
@@ -86,6 +62,22 @@ const display_day = (day) => {
     <div class="day">
         <div class="date">{display_day(i)}</div>
         <!-- TODO:: loop for multiple events in a single day -->
+        {#if events}
+            {#each Object.entries(events) as curr}
+                <div class="event">
+                    <!-- TODO::  remove hardcoded content -->
+                    <div class="time">6pm<br>|<br>9pm</div>
+                    <div class="content">
+                        <div class="title">Title Here</div>
+                        <div class="desc">description of event will go here</div>
+                    </div>
+                </div>
+            {/each} 
+        {:else}
+            <div class="event">
+                
+            </div>
+        {/if}
         <div class="event">
             <!-- TODO::  remove hardcoded content -->
             <div class="time">6pm<br>|<br>9pm</div>

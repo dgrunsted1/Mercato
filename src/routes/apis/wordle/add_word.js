@@ -5,7 +5,6 @@ export const post = async(data) => {
     let body = await data.request.json();
     let results = await mysqlconn.query(`INSERT INTO words (word) VALUES ('${body.word}')`)
         .then(function([err, rows, result, fields]) {
-            console.log(rows);
             return (err) ? err : true;
         });
     return {

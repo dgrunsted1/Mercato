@@ -1,15 +1,4 @@
-<script context="module">
-    export async function load({ fetch }) {
-      const url = `/apis/itinerary/get_itinerary_data`;
-      const response = await fetch(url);
-      return {
-        status: response.status,
-        props: {
-            input_data: response.ok && (await response.json())
-        }
-      };
-    }
-  </script>
+
 <script>
 import { compute_slots } from "svelte/internal";
 
