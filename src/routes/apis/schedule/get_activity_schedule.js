@@ -6,7 +6,7 @@ export const post = async(data) => {
     let events = [];
     let body = await data.request.json();
     let type = body.type;
-    let user = 1;
+    let user = body.user;
     let type_where;
     $: type_where = (type != "home") ? `type = '${type}' AND` :  "";
     let query = `   SELECT 
@@ -67,9 +67,22 @@ export const post = async(data) => {
             }
             if (!found) this_week[i].push();
         }
-        console.log(this_week);
+    
+        let tabs = [];
+        let tab_query = `SELECT a.type as type FROM activity_users as au JOIN activities as a on au.activity_id = a.id WHERE au.user_id=${user}`;
+        console.log(tab_query);
+        let tab_results = await mysqlconn.query(tab_query)
+        .then(function([rows, fields, err]) {
+            return (err) ? err : rows;
+        });
+
+        for (let i = 0; i < tab_results.length; i++){
+            tabs.push(tab_results[i].type);
+        }
+
     return {
-        body: { this_week }
+        body: { this_week: this_week 
+                , tabs: tabs }
     };
 }
 

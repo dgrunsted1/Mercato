@@ -1,19 +1,21 @@
 <script context="module">
     let type = "home";
+    let user_id = 1;
     export async function load({ fetch }) {
         const url = `/apis/schedule/get_activity_schedule`;
         const response = await fetch(url, {
             method: "post",
             body: JSON.stringify({
                 type: type,
-                user: 1
+                user: user_id
             })
         });
         return {
             staus: response.status,
             props: {
-                events: response.ok && (await response.json()),
-                type: type
+                data: response.ok && (await response.json()),
+                type: type,
+                user_id: user_id
             }
         }
     }
@@ -26,11 +28,11 @@
     import Schedule from '../lib/components/schedule.svelte';
     import Map from '../lib/components/map.svelte';
     import Chat from '../lib/components/chat.svelte';
-    const curr_tabs = ["home", "golf", "beach", "dinner", "brunch", "lunch", "walk", "tennis", "hike", "shop", "eat", "drinks"];
     export let type;
-    export let events;
-    events = events.this_week;
-    console.log(events);
+    export let data;
+    export let user_id;
+    let events = data.this_week;
+    let tabs = data.tabs;
 
     const set_events = async (type_in) => {
         type = type_in;
@@ -39,7 +41,7 @@
             method: "post",
             body: JSON.stringify({
                 type: type,
-                user: 1
+                user: user_id
             })
         });
         events = response.ok && (await response.json());
@@ -60,7 +62,7 @@
     </div>
 
     <div id="tabs">
-        {#each curr_tabs as tab}
+        {#each tabs as tab}
             <div class="tab" on:click={() => set_events(tab)}>
                 {tab}
             </div>

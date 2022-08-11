@@ -62,10 +62,10 @@
             {/each} 
         {:else}
             <div class="event">
-                <div class="time">no events</div>
+                <div class="time">no events today</div>
                 <div class="content">
-                    <div class="title">no events</div>
-                    <div class="desc">no events</div>
+                    <div class="title">no events today</div>
+                    <div class="desc">no events today</div>
                 </div>
             </div>
         {/if}
