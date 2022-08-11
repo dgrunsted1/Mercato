@@ -1,10 +1,7 @@
 <script context="module">
     let type = "home";
     export async function load({ fetch }) {
-        console.log("start load function");
         const url = `/apis/schedule/get_activity_schedule`;
-        console.log("type");
-        console.log(type);
         const response = await fetch(url, {
             method: "post",
             body: JSON.stringify({
@@ -12,11 +9,11 @@
                 user: 1
             })
         });
-        console.log("end load function");
         return {
             staus: response.status,
             props: {
-                events: response.ok && (await response.json())
+                events: response.ok && (await response.json()),
+                type: type
             }
         }
     }
@@ -30,11 +27,24 @@
     import Map from '../lib/components/map.svelte';
     import Chat from '../lib/components/chat.svelte';
     const curr_tabs = ["home", "golf", "beach", "dinner", "brunch", "lunch", "walk", "tennis", "hike", "shop", "eat", "drinks"];
-    // @ts-ignore
     export let type;
     export let events;
-    events = events.events;
+    events = events.this_week;
     console.log(events);
+
+    const set_events = async (type_in) => {
+        type = type_in;
+        const url = `/apis/schedule/get_activity_schedule`;
+        const response = await fetch(url, {
+            method: "post",
+            body: JSON.stringify({
+                type: type,
+                user: 1
+            })
+        });
+        events = response.ok && (await response.json());
+        events = events.this_week;
+    }
     
 
 </script>
@@ -43,8 +53,7 @@
 <div id="page">
     <div id="content">
         <h1>{type}</h1>
-
-        <Schedule bind:type={type} bind:events={events}/>
+        <Schedule bind:type bind:events/>
         <!-- <Map type={curr_tab}/>
 
         <Chat type={curr_tab}/> -->
@@ -52,7 +61,7 @@
 
     <div id="tabs">
         {#each curr_tabs as tab}
-            <div class="tab" on:click={() => {type = tab;}}>
+            <div class="tab" on:click={() => set_events(tab)}>
                 {tab}
             </div>
         {/each}

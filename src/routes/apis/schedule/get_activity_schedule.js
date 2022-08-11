@@ -2,7 +2,6 @@ import { mysqlconnFn } from '$lib/components/db';
 import { ExitStatus } from 'typescript';
 
 export const post = async(data) => {
-    console.log("start get_activity_schedule.js");
     let mysqlconn = await mysqlconnFn();
     let events = [];
     let body = await data.request.json();
@@ -37,9 +36,10 @@ export const post = async(data) => {
     let results = await mysqlconn.query(query)
         .then(function([rows, fields, err]) {
             return (err) ? err : rows;
-        });
-        console.log("40 get_activity_schedule.js");
-        for (let i = 0; i < results.length; i++){
+    });
+
+
+    for (let i = 0; i < results.length; i++){
         events.push({
             id: results[i].id,
             start_date: results[i].start_date,
@@ -51,10 +51,25 @@ export const post = async(data) => {
             location_description: results[i].location_description
         });
     }
-    console.log({events});
-    console.log("end get_activity_schedule.js");
+
+    let this_week = [[],[],[],[],[],[],[]];
+        let todays_date = new Date();
+        for (let i = 0; i < 7; i++) {
+            let temp_date_begin = new Date(todays_date.getFullYear(), todays_date.getMonth(), todays_date.getDate()+i);
+            let temp_date_end = new Date(todays_date.getFullYear(), todays_date.getMonth(), todays_date.getDate()+i+1);
+            let found = false;
+            for (let j = 0; j < events.length; j++) {
+                if (events[j].start_date >= temp_date_begin && events[j].start_date < temp_date_end || 
+                    events[j].end_date >= temp_date_begin && events[j].end_date < temp_date_end) {
+                    this_week[i].push(events[j]);
+                    found = true;
+                }
+            }
+            if (!found) this_week[i].push();
+        }
+        console.log(this_week);
     return {
-        body: { events }
+        body: { this_week }
     };
 }
 

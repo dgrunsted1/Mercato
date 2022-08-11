@@ -9,7 +9,7 @@ let pages = ['wordle', 'travel', 'music', 'sports', 'fashion', 'cooking', 'do_mo
 <SideBar {pages} />
 
 <main>
-<slot/>
+<slot></slot>
 </main>
 
 <footer>

@@ -5,52 +5,39 @@
 
 
 <script>
-    console.log("start schedule.svelte");
     export let type;
-    export let events;    
+    export let events; 
     let todays_date = new Date();
-    const get_days_of_week = () => {
-        let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        return days[todays_date.getDay()];
-    }
+    
     const days = ["Sun","Mon","Tues","Wed","Thur","Fri","Sat"];
-    // console.log({events});
     const display_day = (day) => {
-        console.log("start display_day");
         if (day === 0) {
-            console.log("end display_day");
             return "Today";
         } else {
             var dd = todays_date.getDate();
             var mm = todays_date.getMonth();
             var yyyy = todays_date.getFullYear();
             let curr = new Date(yyyy, mm, dd+day);
-            console.log("end display_day");
             return `${days[curr.getDay()]} ${curr.getDate()}`;
             
         }
     };
 
-    const get_weeks_schedule = (events) => {
-        // let queue = events.sort((a, b) => { a.start_date - b.start_date } );
-        let queue = [];
-        let weeks = [];
-        for (let i = 0; i < 7; i++) {
-            let temp_date_begin = new Date(todays_date.getFullYear(), todays_date.getMonth(), todays_date.getDate()+i);
-            let temp_date_end = new Date(todays_date.getFullYear(), todays_date.getMonth(), todays_date.getDate()+i+1);
-            for (let j = 0; j < queue.length; j++) {
-                if (queue[j].start_date >= temp_date_begin && queue[j].start_date < temp_date_end ||
-                    queue[j].end_date >= temp_date_begin && queue[j].end_date < temp_date_end) {
-                    weeks.push(queue[j]);
-                }else {
 
-                }
-            }
+    const get_time_range = (event) => {
+        
+
+        let start = new Date(event.start_date).toLocaleTimeString().replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, "$1$3");
+        let end = new Date(event.end_date).toLocaleTimeString().replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, "$1$3");
+        
+        return {
+            start_time: start,
+            end_time: end
         }
+
     };
 
-    let weeks_schedule = get_weeks_schedule(events);
-    console.log("end schedule.svelte");
+
 </script>
 
 <div id="new_entry">
@@ -62,30 +49,34 @@
     <div class="day">
         <div class="date">{display_day(i)}</div>
         <!-- TODO:: loop for multiple events in a single day -->
-        {#if events}
-            {#each Object.entries(events) as curr}
+        {#if events[i].length > 0}
+            {#each Object.entries(events[i]) as curr}
                 <div class="event">
                     <!-- TODO::  remove hardcoded content -->
-                    <div class="time">6pm<br>|<br>9pm</div>
+                    <div class="time">{get_time_range(curr[1]).start_time}<br>|<br>{get_time_range(curr[1]).end_time}</div>
                     <div class="content">
-                        <div class="title">Title Here</div>
-                        <div class="desc">description of event will go here</div>
+                        <div class="title">{curr[1].name}</div>
+                        <div class="desc">{curr[1].event_description}<br>{curr[1].location_description}</div>
                     </div>
                 </div>
             {/each} 
         {:else}
             <div class="event">
-                
+                <div class="time">no events</div>
+                <div class="content">
+                    <div class="title">no events</div>
+                    <div class="desc">no events</div>
+                </div>
             </div>
         {/if}
-        <div class="event">
+        <!-- <div class="event"> -->
             <!-- TODO::  remove hardcoded content -->
-            <div class="time">6pm<br>|<br>9pm</div>
-            <div class="content">
-                <div class="title">Title Here</div>
-                <div class="desc">description of event will go here</div>
-            </div>
-        </div>
+            <!-- <div class="time">6pm<br>|<br>9pm</div> -->
+            <!-- <div class="content"> -->
+                <!-- <div class="title">Title Here</div> -->
+                <!-- <div class="desc">description of event will go here</div> -->
+            <!-- </div> -->
+        <!-- </div> -->
     </div>
 {/each}
 </div>
