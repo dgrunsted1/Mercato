@@ -50,8 +50,9 @@ import { displayPartsToString } from 'typescript';
                 user: user_id
             })
         });
-        events = response.ok && (await response.json());
-        events = events.this_week;
+        data = response.ok && (await response.json());
+        events = data.this_week;
+        locations = data.locations;
     }
 
     const upload_entry = () => {

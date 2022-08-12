@@ -79,7 +79,7 @@ export const post = async(data) => {
         }
         let locations = [];
         let and_activity = (type != 'home') ? ` AND a.type = '${type}'` :``;
-        let loc_query = `SELECT l.name as name, l.id as id FROM locations AS l JOIN activity_locations AS al ON l.id = al.location_id JOIN activity_users AS au ON au.activity_id=al.activity_id JOIN activities AS a ON a.id=al.activity_id WHERE au.user_id=${user}`;
+        let loc_query = `SELECT l.name as name, l.id as id FROM locations AS l JOIN activity_locations AS al ON l.id = al.location_id JOIN activity_users AS au ON au.activity_id=al.activity_id JOIN activities AS a ON a.id=al.activity_id WHERE au.user_id=${user}${and_activity}`;
 
         let loc_results = await mysqlconn.query(loc_query)
         .then(function([rows, fields, err]) {

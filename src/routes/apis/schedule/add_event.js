@@ -12,8 +12,10 @@ export const post = async(data) => {
             return (err) ? err : rows;
     });
 
-// get resulting id for new event and 
-//add the creating user as as event_user for that event
+    let add_user_query = `INSERT INTO event_users (event_id, user_id) VALUES (${results.insertId}, ${body.user})`;
+    let add_user_results = await mysqlconn.query(add_user_query)
+        .then(function([rows, fields, err]) {
+            return (err) ? err : rows;
+    });
 
-   
 }
