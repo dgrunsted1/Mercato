@@ -1,27 +1,39 @@
-
-
-
-
-
-
 <script>
+
+
+    import { createEventDispatcher } from 'svelte';
+
+
+
     export let type;
     export let events; 
-    let todays_date = new Date();
-    
+
+
+    const dispatch = createEventDispatcher();
+    const todays_date = new Date(); 
     const days = ["Sun","Mon","Tues","Wed","Thur","Fri","Sat"];
+
+
+
     const display_day = (day) => {
         if (day === 0) {
-            return "Today";
+            return {
+                display: "Today",
+                date: todays_date
+            } 
         } else {
             var dd = todays_date.getDate();
             var mm = todays_date.getMonth();
             var yyyy = todays_date.getFullYear();
             let curr = new Date(yyyy, mm, dd+day);
-            return `${days[curr.getDay()]} ${curr.getDate()}`;
+            return {
+                display: `${days[curr.getDay()]} ${curr.getDate()}`,
+                date: curr
+            };
             
         }
     };
+
 
 
     const get_time_range = (event) => {
@@ -38,6 +50,14 @@
     };
 
 
+
+    function new_entry(date_in){
+        dispatch('new_entry', {
+			date: date_in
+		});
+    }
+
+
 </script>
 
 <div id="new_entry">
@@ -47,7 +67,7 @@
 <div id="main">
     {#each Array(7) as _, i}
     <div class="day">
-        <div class="date">{display_day(i)}</div>
+        <div class="date" on:click={() => new_entry(display_day(i).date)}>{display_day(i).display}</div>
         <!-- TODO:: loop for multiple events in a single day -->
         {#if events[i].length > 0}
             {#each Object.entries(events[i]) as curr}
@@ -61,7 +81,7 @@
                 </div>
             {/each} 
         {:else}
-            <div class="event">
+            <div class="event" on:click={() => new_entry(display_day(i).date)}>
                 <div class="time">no events today</div>
                 <div class="content">
                     <div class="title">no events today</div>

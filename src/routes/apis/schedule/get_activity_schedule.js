@@ -32,7 +32,6 @@ export const post = async(data) => {
                     WHERE 
                         ${type_where} 
                         user_id=${user}`;
-                        console.log(query);
     let results = await mysqlconn.query(query)
         .then(function([rows, fields, err]) {
             return (err) ? err : rows;
@@ -69,20 +68,31 @@ export const post = async(data) => {
         }
     
         let tabs = [];
-        let tab_query = `SELECT a.type as type FROM activity_users as au JOIN activities as a on au.activity_id = a.id WHERE au.user_id=${user}`;
-        console.log(tab_query);
+        let tab_query = `SELECT a.type as type, a.id as id FROM activity_users as au JOIN activities as a on au.activity_id = a.id WHERE au.user_id=${user}`;
         let tab_results = await mysqlconn.query(tab_query)
         .then(function([rows, fields, err]) {
             return (err) ? err : rows;
         });
 
         for (let i = 0; i < tab_results.length; i++){
-            tabs.push(tab_results[i].type);
+            tabs.push({type: tab_results[i].type, id: tab_results[i].id});
         }
+        let locations = [];
+        let and_activity = (type != 'home') ? ` AND a.type = '${type}'` :``;
+        let loc_query = `SELECT l.name as name, l.id as id FROM locations AS l JOIN activity_locations AS al ON l.id = al.location_id JOIN activity_users AS au ON au.activity_id=al.activity_id JOIN activities AS a ON a.id=al.activity_id WHERE au.user_id=${user}`;
 
+        let loc_results = await mysqlconn.query(loc_query)
+        .then(function([rows, fields, err]) {
+            return (err) ? err : rows;
+        });
+
+        for (let i = 0; i < loc_results.length; i++){
+            locations.push({name: loc_results[i].name,id: loc_results[i].id});
+        }
     return {
         body: { this_week: this_week 
-                , tabs: tabs }
+                , tabs: tabs,
+                locations: locations }
     };
 }
 
