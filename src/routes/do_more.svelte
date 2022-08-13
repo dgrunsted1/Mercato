@@ -28,7 +28,7 @@
     import Schedule from '../lib/components/schedule.svelte';
     import Map from '../lib/components/map.svelte';
     import Chat from '../lib/components/chat.svelte';
-import { displayPartsToString } from 'typescript';
+    import { displayPartsToString } from 'typescript';
     export let type;
     export let data;
     export let user_id;
@@ -40,6 +40,8 @@ import { displayPartsToString } from 'typescript';
     let max = new Date();
     max.setDate(max.getDate()+7);
     max.setHours(0, 0, 0);
+
+
     const set_events = async (type_in) => {
         type = type_in;
         const url = `/apis/schedule/get_activity_schedule`;
@@ -56,7 +58,10 @@ import { displayPartsToString } from 'typescript';
     }
 
     const upload_entry = () => {
-        console.log("upload entry");
+        if (document.getElementById("event_id").value){
+            upload_edited_entry();
+            return;
+        }
         let selected_activity = document.getElementById("selected_activity").value;
         let selected_location = document.getElementById("selected_location").value;
         let selected_start_date = document.getElementById("selected_start_date").value;
@@ -64,6 +69,7 @@ import { displayPartsToString } from 'typescript';
         let selected_description = document.getElementById("selected_description").value;
         //fetch to insert entry
         let url = `/apis/schedule/add_event`;
+        console.log({url});
         const response = fetch(url, {
             method: "post",
             body: JSON.stringify({
@@ -75,12 +81,30 @@ import { displayPartsToString } from 'typescript';
                 user: user_id
             })
         });
-        // if (response.ok) {
-        //     return response.status
-        // }else {
-        //     console.log("fail");
-        // }
-        //add to current calender
+    }
+
+    const upload_edited_entry = () => {
+        let selected_activity = document.getElementById("selected_activity").value;
+        let selected_location = document.getElementById("selected_location").value;
+        let selected_start_date = document.getElementById("selected_start_date").value;
+        let selected_end_date = document.getElementById("selected_end_date").value;
+        let selected_description = document.getElementById("selected_description").value;
+        let event_id = document.getElementById("event_id").value;
+        //fetch to insert entry
+        let url = `/apis/schedule/edit_event`;
+        console.log({url});
+        const response = fetch(url, {
+            method: "post",
+            body: JSON.stringify({
+                id: event_id,
+                act: selected_activity,
+                loc: selected_location,
+                start: selected_start_date,
+                end: selected_end_date,
+                description: selected_description,
+                user: user_id
+            })
+        });
     }
 
     const remove_popup = () => {
@@ -88,8 +112,8 @@ import { displayPartsToString } from 'typescript';
         document.getElementById("popup_overlay").style.display = "none";
     }
 
-    const show_popup = (event) => {
-        console.log(event.detail.date);
+    const new_entry = (event) => {
+        console.log(event.detail.event);
         document.getElementById("popup_overlay").style.display = "block";
         if (event.detail.date){
             let date = event.detail.date;
@@ -103,6 +127,22 @@ import { displayPartsToString } from 'typescript';
         }
     }
 
+    const edit_entry = (event) => {
+        let event_data = event.detail.event;
+        console.log(event_data);
+        document.getElementById("popup_overlay").style.display = "block";
+        if (event_data.start_date){
+            let start_temp = new Date(event_data.start_date);
+            document.getElementById("selected_start_date").value = start_temp.toISOString().slice(0,16);
+        }
+        if (event_data.end_date){
+            let end_temp = new Date(event_data.end_date);
+            document.getElementById("selected_end_date").value = end_temp.toISOString().slice(0,16);
+        }
+        if (event_data.event_description) document.getElementById("selected_description").value = event_data.event_description;
+        if (event_data.id) document.getElementById("event_id").value = event_data.id;
+    }
+
     const do_nothing = () => {
         console.log("do nothing");
     }
@@ -112,10 +152,10 @@ import { displayPartsToString } from 'typescript';
 <div id="page">
     <div id="content">
         <h1>{type}</h1>
-        <Schedule bind:type bind:events on:new_entry={show_popup}/>
-        <!-- <Map type={curr_tab}/>
+        <Schedule bind:type bind:events on:new_entry={new_entry} on:edit_entry={edit_entry}/>
+        <!-- <Map type={type}/> -->
 
-        <Chat type={curr_tab}/> -->
+        <!-- <Chat type/> -->
     </div>
 
     <div id="tabs">
@@ -147,6 +187,7 @@ import { displayPartsToString } from 'typescript';
             <label for="start_date">Start:</label><input type="datetime-local" name="start_date" id="selected_start_date" min={min.toDateString()} max={max.toDateString()}>
             <label for="end_date">End:</label><input type="datetime-local" name="end_date" id="selected_end_date" min={min.toDateString()} max={max.toDateString()}>
             <label for="description">descirption</label><input type="text" name="description" id="selected_description" size="50">
+            <input type="number" name="event_id" id="event_id">
             <input type="submit" on:click={() => upload_entry()} value="add event">
         </form>
     </div>
@@ -162,53 +203,56 @@ import { displayPartsToString } from 'typescript';
 
 <style>
 
-#page {
-    position: absolute;
-    margin: 2px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+    #page {
+        position: absolute;
+        margin: 2px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-#tabs {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: fit-content;
-    height: 30px;
-    padding-right: 20px;
-    
-}
+    #tabs {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: fit-content;
+        height: 30px;
+        padding-right: 20px;
+        
+    }
 
-.tab {
-    padding: 5px;
-    border: .5px solid black;
-    /* border-radius: 5px; */
-    /* margin: 2px; */
-    background-color: #f0f0f0;
-    cursor: pointer;
-}
+    .tab {
+        padding: 5px;
+        border: .5px solid black;
+        /* border-radius: 5px; */
+        /* margin: 2px; */
+        background-color: #f0f0f0;
+        cursor: pointer;
+    }
 
-#popup_overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background : rgba(0,0,0,0.5);
-}
+    #popup_overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background : rgba(0,0,0,0.5);
+    }
 
-#window {
-    margin: 70px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 5px;
-    width: 30%;
-    position: relative;
-    transition: all 5s ease-in-out;
-}
+    #window {
+        margin: 70px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 5px;
+        width: 30%;
+        position: relative;
+        transition: all 5s ease-in-out;
+    }
 
+    #event_id {
+        visibility: hidden;
+    }
 
 </style>

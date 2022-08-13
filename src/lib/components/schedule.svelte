@@ -57,6 +57,12 @@
 		});
     }
 
+    function edit_entry(event){
+        dispatch('edit_entry', {
+			event: event
+		});
+    }
+    
 
 </script>
 
@@ -71,7 +77,7 @@
         <!-- TODO:: loop for multiple events in a single day -->
         {#if events[i].length > 0}
             {#each Object.entries(events[i]) as curr}
-                <div class="event">
+                <div class="event" on:click={() => edit_entry(curr[1])}>
                     <!-- TODO::  remove hardcoded content -->
                     <div class="time">{get_time_range(curr[1]).start_time}<br>|<br>{get_time_range(curr[1]).end_time}</div>
                     <div class="content">
@@ -89,14 +95,6 @@
                 </div>
             </div>
         {/if}
-        <!-- <div class="event"> -->
-            <!-- TODO::  remove hardcoded content -->
-            <!-- <div class="time">6pm<br>|<br>9pm</div> -->
-            <!-- <div class="content"> -->
-                <!-- <div class="title">Title Here</div> -->
-                <!-- <div class="desc">description of event will go here</div> -->
-            <!-- </div> -->
-        <!-- </div> -->
     </div>
 {/each}
 </div>
