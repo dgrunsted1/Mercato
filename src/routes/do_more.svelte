@@ -62,6 +62,9 @@
             upload_edited_entry();
             return;
         }
+
+        // TODO bind these values
+
         let selected_activity = document.getElementById("selected_activity").value;
         let selected_location = document.getElementById("selected_location").value;
         let selected_start_date = document.getElementById("selected_start_date").value;
@@ -127,6 +130,8 @@
         }
     }
 
+
+    // TODO entries move up 3-4 hours when editing
     const edit_entry = (event) => {
         let event_data = event.detail.event;
         console.log(event_data);
@@ -142,10 +147,6 @@
         if (event_data.event_description) document.getElementById("selected_description").value = event_data.event_description;
         if (event_data.id) document.getElementById("event_id").value = event_data.id;
     }
-
-    const do_nothing = () => {
-        console.log("do nothing");
-    }
 </script>
 
 
@@ -153,7 +154,7 @@
     <div id="content">
         <h1>{type}</h1>
         <Schedule bind:type bind:events on:new_entry={new_entry} on:edit_entry={edit_entry}/>
-        <!-- <Map type={type}/> -->
+        <Map bind:type bind:locations/>
 
         <!-- <Chat type/> -->
     </div>
