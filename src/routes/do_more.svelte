@@ -62,6 +62,9 @@
             upload_edited_entry();
             return;
         }
+
+        // TODO bind these values
+
         let selected_activity = document.getElementById("selected_activity").value;
         let selected_location = document.getElementById("selected_location").value;
         let selected_start_date = document.getElementById("selected_start_date").value;
@@ -153,7 +156,7 @@
     <div id="content">
         <h1>{type}</h1>
         <Schedule bind:type bind:events on:new_entry={new_entry} on:edit_entry={edit_entry}/>
-        <!-- <Map type={type}/> -->
+        <Map bind:type/>
 
         <!-- <Chat type/> -->
     </div>
