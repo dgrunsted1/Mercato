@@ -130,6 +130,8 @@
         }
     }
 
+
+    // TODO entries move up 3-4 hours when editing
     const edit_entry = (event) => {
         let event_data = event.detail.event;
         console.log(event_data);
@@ -144,10 +146,6 @@
         }
         if (event_data.event_description) document.getElementById("selected_description").value = event_data.event_description;
         if (event_data.id) document.getElementById("event_id").value = event_data.id;
-    }
-
-    const do_nothing = () => {
-        console.log("do nothing");
     }
 </script>
 

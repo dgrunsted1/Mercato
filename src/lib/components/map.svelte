@@ -3,7 +3,6 @@
     import { browser } from '$app/env';
     //Creates a script tag that loads the MapKitJS Library and then
     //calls `mapkit.init` to initialize the library with your JWT.
-    console.log("here");
    const setupMapKitJs = async() => {
        // Create and Load the MapKit JS Script Tag
        await new Promise(resolve => {
@@ -70,12 +69,16 @@
 <div id="map_container">
     <div id="list_container">
         <div id="list_header">{type} Locations</div>
-        {#each locations as location}
-            <div class="location" id={location.id}>
-                <div class="loc_name">{location.name}</div>
-                <div class="loc_description">{location.desc}</div>
-            </div>
-        {/each}
+        {#if locations.length}
+            {#each locations as location}
+                <div class="location" id={location.id}>
+                    <div class="loc_name">{location.name}</div>
+                    <div class="loc_description">{location.desc}</div>
+                </div>
+            {/each}
+        {:else}
+            <p>No locations added yet.</p>
+        {/if}
     </div>
     <div id="map" on:click={add_annotation}></div>
 </div>
@@ -106,8 +109,9 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    /* width: 100%; */
     height: 100%;
+    margin: 2% 2%;
 }
 
 #list_container {
@@ -115,7 +119,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
 }
 
