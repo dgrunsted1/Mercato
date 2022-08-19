@@ -1,68 +1,88 @@
 
-<script context="module">
-    import { browser } from '$app/env';
-    //Creates a script tag that loads the MapKitJS Library and then
-    //calls `mapkit.init` to initialize the library with your JWT.
-   const setupMapKitJs = async() => {
-       // Create and Load the MapKit JS Script Tag
-       await new Promise(resolve => {
-           const element = document.createElement("script");
-           element.addEventListener("load", () => { resolve(); });
-           element.src = "https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js";
-           document.head.appendChild(element);
-       });
-       // TODO: For production use, the JWT should not be hard-coded into JS.
-       const jwt = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjQ1NjQyVFFIQUsifQ.eyJpc3MiOiI1NjNRTFA2UzU1IiwiaWF0IjoxNjYwODU2OTI2LCJleHAiOjE2NjM0NDg2ODl9.6g-uHDjbeR9ndQRI5pTX3Uan2zfhRcGkHm1gtUXq03og-4RMo6vSPGkIlsfRf6JGs9AnhLRoG2AjCaaG-w20UQ";
-       mapkit.init({
-           authorizationCallback: done => { done(jwt); }
-       });
-   };
-
-   /**
-   * Script Entry Point
-   */
-  const main = async() => {
-      await setupMapKitJs();
-  
-      const cupertino = new mapkit.CoordinateRegion(
-          new mapkit.Coordinate(43.05407, -87.89288),
-          new mapkit.CoordinateSpan(0.02, 0.04)
-        //   new mapkit.CoordinateSpan(0.167647972, 0.354985255)
-        // ratio 1st / 2nd = .472
-      );
-  
-      // Create a map in the element whose ID is "map"
-      const map = new mapkit.Map("map");
-      map.region = cupertino;
-  };
-  
-  if (browser) main();
-</script>
 
 <script>
+    import { browser } from '$app/env';
    export let type;
    export let locations;
-   export let map;
    let clickAnnotation;
 
-   // Drop an annotation where a Shift-click is detected:
-   const add_annotation = function(event) {
-         console.log(event);
-            if(!event.shiftKey) {
-                return;
-            }
-        
-            if(clickAnnotation) {
-                map.removeAnnotation(clickAnnotation);
-            }
-        
-            var coordinate = map.convertPointOnPageToCoordinate(new DOMPoint(event.pageX, event.pageY));
-            clickAnnotation = new MarkerAnnotation(coordinate, {
-                title: "Click!",
-                color: "#c969e0"
-            });
-            map.addAnnotation(clickAnnotation);
-        };
+/**
+ * Creates a script tag that loads the MapKitJS Library and then
+ * calls `mapkit.init` to initialize the library with your JWT.
+ */
+ const setupMapKitJs = async() => {
+    // Create and Load the MapKit JS Script Tag
+    await new Promise(resolve => {
+        const element = document.createElement("script");
+        element.addEventListener("load", () => { resolve(); });
+        element.src = "https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js";
+        document.head.appendChild(element);
+    });
+    // TODO: For production use, the JWT should not be hard-coded into JS.
+    const jwt = "";
+    mapkit.init({
+        authorizationCallback: done => { done(jwt); }
+    });
+};
+
+const main = async() => {
+    await setupMapKitJs();
+
+    // Create the Map and Geocoder
+    const map = new mapkit.Map("map");
+    const geocoder = new mapkit.Geocoder({ language: "en-US" });
+
+    // Create the "Event" annotation, setting properties in the constructor.
+    const event = new mapkit.Coordinate(37.7831, -122.4041);
+    const eventAnnotation = new mapkit.MarkerAnnotation(event, {
+        color: "#4eabe9",
+        title: "Event",
+        glyphText: "\u{1F37F}" // Popcorn Emoji
+    });
+
+    // Create the "Work" annotation, setting properties after construction.
+    const work = new mapkit.Coordinate(37.3349, -122.0090);
+    const workAnnotation = new mapkit.MarkerAnnotation(work);
+    workAnnotation.color = "#969696";
+    workAnnotation.title = "Work";
+    workAnnotation.subtitle = "Apple Park";
+    workAnnotation.selected = "true";
+    workAnnotation.glyphText = "\u{F8FF}"; // Apple Symbol
+
+    // Add and show both annotations on the map
+    map.showItems([eventAnnotation, workAnnotation]);
+
+    // This will contain the user-set single-tap annotation.
+    let clickAnnotation = null;
+
+    // Add or move an annotation when a user single-taps an empty space
+    map.addEventListener("single-tap", event => {
+        if (clickAnnotation) {
+            map.removeAnnotation(clickAnnotation);
+        }
+
+        // Get the clicked coordinate and add an annotation there
+        const point = event.pointOnPage;
+        const coordinate = map.convertPointOnPageToCoordinate(point);
+
+        clickAnnotation = new mapkit.MarkerAnnotation(coordinate, {
+            title: "Loading...",
+            color: "#c969e0"
+        });
+
+        map.addAnnotation(clickAnnotation);
+
+        // Look up the address with the Geocoder's Reverse Lookup Function
+        geocoder.reverseLookup(coordinate, (error, data) => {
+            const first = (!error && data.results) ? data.results[0] : null;
+            clickAnnotation.title = (first && first.name) || "";
+        });
+    });
+
+};
+
+if (browser) main();
+
 </script>
 
 
