@@ -10,7 +10,7 @@ export const post = async(data) => {
     let type_where;
     $: type_where = (type != "home") ? `type = '${type}' AND` :  "";
     let query = `   SELECT 
-                        e.id as id, start_date, end_date, e.description as event_description, l.name as name, l.address as address, l.coordinates as coords, al.description as location_description
+                        e.id as id, start_date, end_date, e.description as event_description, l.name as name, l.address as address, l.lattd as lattd, l.lngtd as lngtd, al.description as location_description
                     FROM 
                         events as e 
                     JOIN 
@@ -46,7 +46,8 @@ export const post = async(data) => {
             event_description: results[i].event_description,
             name: results[i].name,
             address: results[i].address,
-            coords: results[i].coords,
+            lattd: results[i].lattd,
+            lngtd: results[i].lngtd,
             location_description: results[i].location_description
         });
     }
