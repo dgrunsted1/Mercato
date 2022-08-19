@@ -32,7 +32,7 @@
         // ratio 1st / 2nd = .472
       );
   
-      // Create a map in the element whose ID is "map-container"
+      // Create a map in the element whose ID is "map"
       const map = new mapkit.Map("map");
       map.region = cupertino;
   };
@@ -49,9 +49,9 @@
    // Drop an annotation where a Shift-click is detected:
    const add_annotation = function(event) {
          console.log(event);
-            // if(!event.shiftKey) {
-            //     return;
-            // }
+            if(!event.shiftKey) {
+                return;
+            }
         
             if(clickAnnotation) {
                 map.removeAnnotation(clickAnnotation);
