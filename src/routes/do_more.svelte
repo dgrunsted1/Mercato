@@ -154,7 +154,7 @@
     <div id="content">
         <h1>{type}</h1>
         <Schedule bind:type bind:events on:new_entry={new_entry} on:edit_entry={edit_entry}/>
-        <Map bind:type bind:locations/>
+        <Map bind:type bind:locations on:map_update={() => set_events(type)}/>
 
         <!-- <Chat type/> -->
     </div>
