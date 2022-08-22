@@ -165,7 +165,7 @@ const add_location = async () => {
    width: 100%;
    height: 600px;
    margin-left: 80px;
-
+    margin-right: 40px;
 }
 
 #map_container {
