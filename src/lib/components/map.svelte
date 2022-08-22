@@ -2,6 +2,7 @@
 
 <script>
     import { browser } from '$app/env';
+import Clothes from '$lib/icons/Clothes.svelte';
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher() ;
    export let type;
@@ -10,6 +11,8 @@
    let lngtd_in = 0;
    let loc_name_in = "";
    let loc_desc_in = "";
+   let annotations = [];
+   let added_last = false;
 
 /**
  * Creates a script tag that loads the MapKitJS Library and then
@@ -36,8 +39,8 @@ const main = async() => {
     // Create the Map and Geocoder
     const map = new mapkit.Map("map");
     const geocoder = new mapkit.Geocoder({ language: "en-US" });
-    let annotations = [];
     // Create the "Event" annotation, setting properties in the constructor.
+    annotations = [];
     for (let i = 0; i < locations.length; i++){
         const event = new mapkit.Coordinate(locations[i].lattd, locations[i].lngtd);
         const eventAnnotation = new mapkit.MarkerAnnotation(event, {
@@ -68,8 +71,10 @@ const main = async() => {
     // Add or move an annotation when a user single-taps an empty space
     map.addEventListener("single-tap", event => {
         if (type == "home") return;
-        if (clickAnnotation) {
+        if (clickAnnotation && !added_last) {
             map.removeAnnotation(clickAnnotation);
+        }else if (added_last){
+            added_last = false;
         }
 
         // Get the clicked coordinate and add an annotation there
@@ -94,9 +99,12 @@ const main = async() => {
         document.getElementById("location_new").style.display = "flex";
     });
 
+    
+
 };
 
 if (browser) main();
+
 const add_location = async () => {
         const url = `/apis/map/add_location`;
         const response = await fetch(url, {
@@ -118,9 +126,9 @@ const add_location = async () => {
             document.getElementById("location_new").style.display = "none";
 
             dispatch('map_update');
+            added_last = true;
         }
     }
-
 </script>
 
 
