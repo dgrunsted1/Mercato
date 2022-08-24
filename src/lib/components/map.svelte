@@ -40,10 +40,46 @@ const main = async() => {
     const map = new mapkit.Map("map");
     const geocoder = new mapkit.Geocoder({ language: "en-US" });
     // Create the "Event" annotation, setting properties in the constructor.
+
+    var calloutDelegate = {
+        // Return a div element and populate it with information from the
+        // annotation, including a link to a review site.
+        calloutContentForAnnotation: function(annotation) {
+            var element = document.createElement("div");
+            element.className = "review-callout-content";
+            var title = element.appendChild(document.createElement("div"));
+            title.className = "callout_title";
+            title.textContent = annotation.title;
+            var desc = element.appendChild(document.createElement("div"));
+            desc.className = "callout_desc";
+            desc.textContent = annotation.subtitle;
+            // TODO add event btn
+            var event_btn = element.appendChild(document.createElement("button"));
+            event_btn.id = "callout_event";
+            event_btn.textContent = "create event";
+            event_btn.addEventListener("click", event => {
+                dispatch("add_event", {
+                    location_id: annotation.location_id,
+                    location_title: annotation.title
+                });
+            });
+            // TODO edit location btn
+            var edit_btn = element.appendChild(document.createElement("button"));
+            edit_btn.id = "callout_edit";
+            edit_btn.textContent = "edit location";
+            // TODO delete location btn
+            var delete_btn = element.appendChild(document.createElement("button"));
+            delete_btn.id = "callout_delete";
+            delete_btn.textContent = "delete";
+            return element;
+        }
+    };
+
     annotations = [];
     for (let i = 0; i < locations.length; i++){
         const event = new mapkit.Coordinate(locations[i].lattd, locations[i].lngtd);
         const eventAnnotation = new mapkit.MarkerAnnotation(event, {
+            callout: calloutDelegate,
             color: "#4eabe9",
             title: locations[i].name,
             subtitle: locations[i].desc,
@@ -99,8 +135,6 @@ const main = async() => {
         document.getElementById("location_new").style.display = "flex";
     });
 
-    
-
 };
 
 if (browser) main();
@@ -129,6 +163,7 @@ const add_location = async () => {
             added_last = true;
         }
     }
+
 </script>
 
 

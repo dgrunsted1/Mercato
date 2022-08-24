@@ -3,7 +3,6 @@
     //   const url = `/apis/get_itinerary_data`;
       const url = `/apis/test`;
       const response = await fetch(url);
-        // console.log(response);
         return {
         status: response.status,
         props: {

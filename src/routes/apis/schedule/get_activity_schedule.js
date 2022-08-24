@@ -25,13 +25,17 @@ export const post = async(data) => {
                         e.activity_id = au.activity_id 
                         AND 
                         a.id=au.activity_id 
+                        AND
+                        e.location_id = l.id
                         AND 
                         e.activity_id = al.activity_id 
                         AND 
                         al.location_id = l.id 
                     WHERE 
                         ${type_where} 
-                        user_id=${user}`;
+                        user_id=${user}
+                    GROUP BY
+                        e.id`;
     let results = await mysqlconn.query(query)
         .then(function([rows, fields, err]) {
             return (err) ? err : rows;
@@ -49,7 +53,6 @@ export const post = async(data) => {
             location_description: results[i].location_description
         });
     }
-
     let this_week = [[],[],[],[],[],[],[]];
         let todays_date = new Date();
         for (let i = 0; i < 7; i++) {
