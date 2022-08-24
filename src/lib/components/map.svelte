@@ -59,7 +59,6 @@ const main = async() => {
             event_btn.textContent = "create event";
             event_btn.addEventListener("click", event => {
                 dispatch("add_event", {
-                    location_id: annotation.location_id,
                     location_title: annotation.title
                 });
             });
@@ -67,6 +66,15 @@ const main = async() => {
             var edit_btn = element.appendChild(document.createElement("button"));
             edit_btn.id = "callout_edit";
             edit_btn.textContent = "edit location";
+            edit_btn.addEventListener("click", event => {
+                console.log(annotation);
+                lattd_in = annotation.coordinate.latitude;
+                lngtd_in = annotation.coordinate.longitude;
+                loc_name_in = annotation.title;
+                loc_desc_in = annotation.subtitle;
+                document.getElementById("add_loc_btn").value = "save";
+                document.getElementById("location_new").style.display = "flex";
+            });
             // TODO delete location btn
             var delete_btn = element.appendChild(document.createElement("button"));
             delete_btn.id = "callout_delete";
@@ -183,7 +191,7 @@ const add_location = async () => {
         <div class="location" id="location_new">
             <input type="text" name="location_name_in" bind:value={loc_name_in} placeholder="Name">
             <input type="text" name="location_desc_in" bind:value={loc_desc_in} placeholder="Description">
-            <input type="submit" value="Add Location" on:click={add_location}>
+            <input type="submit" id="add_loc_btn" value="Add Location" on:click={add_location}>
         </div>
     </div>
     <div id="map"></div>
