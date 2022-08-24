@@ -5,7 +5,6 @@
     
      //Creates a script tag that loads the MapKitJS Library and then
      //calls `mapkit.init` to initialize the library with your JWT.
-     console.log("here");
     const setupMapKitJs = async() => {
         // Create and Load the MapKit JS Script Tag
         await new Promise(resolve => {

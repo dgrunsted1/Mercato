@@ -1,5 +1,5 @@
 <script context="module">
-    let type = "home";
+    let type = "beach";
     let user_id = 1;
     export async function load({ fetch }) {
         const url = `/apis/schedule/get_activity_schedule`;
@@ -35,6 +35,7 @@
     let events = data.this_week;
     let tabs = data.tabs;
     let locations = data.locations;
+    let curr_location;
     let min = new Date();
     min.setHours(min.getHours()+1);
     let max = new Date();
@@ -62,7 +63,6 @@
             upload_edited_entry();
             return;
         }
-
         // TODO bind these values
 
         let selected_activity = document.getElementById("selected_activity").value;
@@ -111,12 +111,10 @@
     }
 
     const remove_popup = () => {
-        console.log("remove popup");
         document.getElementById("popup_overlay").style.display = "none";
     }
 
     const new_entry = (event) => {
-        console.log(event.detail.event);
         document.getElementById("popup_overlay").style.display = "block";
         if (event.detail.date){
             let date = event.detail.date;
@@ -124,9 +122,11 @@
             let end = new Date(date);
             start.setHours(13, 0, 0);
             end.setHours(16, 0, 0);
-            // date = zero_out_date("hours", date);
             document.getElementById("selected_start_date").value = start.toISOString().slice(0,16);
             document.getElementById("selected_end_date").value = end.toISOString().slice(0,16);
+        }else if (event.detail.location_title){
+            curr_location = event.detail.location_title;
+
         }
     }
 
@@ -134,7 +134,6 @@
     // TODO entries move up 3-4 hours when editing
     const edit_entry = (event) => {
         let event_data = event.detail.event;
-        console.log(event_data);
         document.getElementById("popup_overlay").style.display = "block";
         if (event_data.start_date){
             let start_temp = new Date(event_data.start_date);
@@ -154,7 +153,7 @@
     <div id="content">
         <h1>{type}</h1>
         <Schedule bind:type bind:events on:new_entry={new_entry} on:edit_entry={edit_entry}/>
-        <Map bind:type bind:locations/>
+        <Map bind:type bind:locations on:map_update={() => set_events(type)} on:add_event={new_entry}/>
 
         <!-- <Chat type/> -->
     </div>
@@ -181,9 +180,13 @@
                 {/each}
             </select>
             <label for="location">Location:</label><select name="location" id="selected_location">
-                {#each locations as location}
-                        <option value={location.id}>{location.name}</option>
-                {/each}
+                    {#each locations as location}
+                        {#if location.name == curr_location}
+                            <option value={location.id} selected>{location.name}</option>
+                        {:else}
+                            <option value={location.id}>{location.name}</option>
+                        {/if}
+                    {/each}
             </select>
             <label for="start_date">Start:</label><input type="datetime-local" name="start_date" id="selected_start_date" min={min.toDateString()} max={max.toDateString()}>
             <label for="end_date">End:</label><input type="datetime-local" name="end_date" id="selected_end_date" min={min.toDateString()} max={max.toDateString()}>

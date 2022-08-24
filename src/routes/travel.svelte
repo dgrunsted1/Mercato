@@ -209,13 +209,10 @@ import { compute_slots } from "svelte/internal";
     
     const add_entry = () => {
         let vals = document.getElementsByTagName('input');
-        // console.log({vals});
         let result = {};
         let vals_exist = false;
         let is_config = false;
         [...vals].forEach(element => {
-            // console.log(`value=${element.value}`);
-            // console.log(`name=${element.name}`);
             if (element.value) {
                 vals_exist = true;
                 if (element.name == 'start_location' && element.value != '' ) {

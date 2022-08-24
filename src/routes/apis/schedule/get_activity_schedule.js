@@ -10,7 +10,7 @@ export const post = async(data) => {
     let type_where;
     $: type_where = (type != "home") ? `type = '${type}' AND` :  "";
     let query = `   SELECT 
-                        e.id as id, start_date, end_date, e.description as event_description, l.name as name, l.address as address, l.coordinates as coords, al.description as location_description
+                        e.id as id, start_date, end_date, e.description as event_description, l.name as name, l.address as address, al.description as location_description
                     FROM 
                         events as e 
                     JOIN 
@@ -25,13 +25,17 @@ export const post = async(data) => {
                         e.activity_id = au.activity_id 
                         AND 
                         a.id=au.activity_id 
+                        AND
+                        e.location_id = l.id
                         AND 
                         e.activity_id = al.activity_id 
                         AND 
                         al.location_id = l.id 
                     WHERE 
                         ${type_where} 
-                        user_id=${user}`;
+                        user_id=${user}
+                    GROUP BY
+                        e.id`;
     let results = await mysqlconn.query(query)
         .then(function([rows, fields, err]) {
             return (err) ? err : rows;
@@ -46,11 +50,9 @@ export const post = async(data) => {
             event_description: results[i].event_description,
             name: results[i].name,
             address: results[i].address,
-            coords: results[i].coords,
             location_description: results[i].location_description
         });
     }
-
     let this_week = [[],[],[],[],[],[],[]];
         let todays_date = new Date();
         for (let i = 0; i < 7; i++) {
@@ -79,8 +81,7 @@ export const post = async(data) => {
         }
         let locations = [];
         let and_activity = (type != 'home') ? ` AND a.type = '${type}'` :``;
-        let loc_query = `SELECT l.name as name, l.id as id, al.description as description FROM locations AS l JOIN activity_locations AS al ON l.id = al.location_id JOIN activity_users AS au ON au.activity_id=al.activity_id JOIN activities AS a ON a.id=al.activity_id WHERE au.user_id=${user}${and_activity}`;
-
+        let loc_query = `SELECT l.name as name, l.id as id, al.description as description, l.lattd as lattd, l.lngtd as lngtd FROM locations AS l JOIN activity_locations AS al ON l.id = al.location_id JOIN activity_users AS au ON au.activity_id=al.activity_id JOIN activities AS a ON a.id=al.activity_id WHERE au.user_id=${user}${and_activity}`;
         let loc_results = await mysqlconn.query(loc_query)
         .then(function([rows, fields, err]) {
             return (err) ? err : rows;
@@ -90,7 +91,9 @@ export const post = async(data) => {
             locations.push({
                 id: loc_results[i].id, 
                 name: loc_results[i].name, 
-                desc: loc_results[i].description
+                desc: loc_results[i].description,
+                lattd: Number(loc_results[i].lattd),
+                lngtd: Number(loc_results[i].lngtd)
             });
         }
     return {

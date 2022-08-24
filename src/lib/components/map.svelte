@@ -1,68 +1,177 @@
 
-<script context="module">
-    import { browser } from '$app/env';
-    //Creates a script tag that loads the MapKitJS Library and then
-    //calls `mapkit.init` to initialize the library with your JWT.
-   const setupMapKitJs = async() => {
-       // Create and Load the MapKit JS Script Tag
-       await new Promise(resolve => {
-           const element = document.createElement("script");
-           element.addEventListener("load", () => { resolve(); });
-           element.src = "https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js";
-           document.head.appendChild(element);
-       });
-       // TODO: For production use, the JWT should not be hard-coded into JS.
-       const jwt = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjQ1NjQyVFFIQUsifQ.eyJpc3MiOiI1NjNRTFA2UzU1IiwiaWF0IjoxNjYwODU2OTI2LCJleHAiOjE2NjM0NDg2ODl9.6g-uHDjbeR9ndQRI5pTX3Uan2zfhRcGkHm1gtUXq03og-4RMo6vSPGkIlsfRf6JGs9AnhLRoG2AjCaaG-w20UQ";
-       mapkit.init({
-           authorizationCallback: done => { done(jwt); }
-       });
-   };
-
-   /**
-   * Script Entry Point
-   */
-  const main = async() => {
-      await setupMapKitJs();
-  
-      const cupertino = new mapkit.CoordinateRegion(
-          new mapkit.Coordinate(43.05407, -87.89288),
-          new mapkit.CoordinateSpan(0.02, 0.04)
-        //   new mapkit.CoordinateSpan(0.167647972, 0.354985255)
-        // ratio 1st / 2nd = .472
-      );
-  
-      // Create a map in the element whose ID is "map"
-      const map = new mapkit.Map("map");
-      map.region = cupertino;
-  };
-  
-  if (browser) main();
-</script>
 
 <script>
+    import { browser } from '$app/env';
+import Clothes from '$lib/icons/Clothes.svelte';
+    import { createEventDispatcher } from 'svelte';
+    const dispatch = createEventDispatcher() ;
    export let type;
    export let locations;
-   export let map;
-   let clickAnnotation;
+   let lattd_in = 0;
+   let lngtd_in = 0;
+   let loc_name_in = "";
+   let loc_desc_in = "";
+   let annotations = [];
+   let added_last = false;
 
-   // Drop an annotation where a Shift-click is detected:
-   const add_annotation = function(event) {
-         console.log(event);
-            if(!event.shiftKey) {
-                return;
-            }
-        
-            if(clickAnnotation) {
-                map.removeAnnotation(clickAnnotation);
-            }
-        
-            var coordinate = map.convertPointOnPageToCoordinate(new DOMPoint(event.pageX, event.pageY));
-            clickAnnotation = new MarkerAnnotation(coordinate, {
-                title: "Click!",
-                color: "#c969e0"
+/**
+ * Creates a script tag that loads the MapKitJS Library and then
+ * calls `mapkit.init` to initialize the library with your JWT.
+ */
+ const setupMapKitJs = async() => {
+    // Create and Load the MapKit JS Script Tag
+    await new Promise(resolve => {
+        const element = document.createElement("script");
+        element.addEventListener("load", () => { resolve(); });
+        element.src = "https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js";
+        document.head.appendChild(element);
+    });
+    // TODO: For production use, the JWT should not be hard-coded into JS.
+    const jwt = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjQ1NjQyVFFIQUsifQ.eyJpc3MiOiI1NjNRTFA2UzU1IiwiaWF0IjoxNjYwODU2OTI2LCJleHAiOjE2NjM0NDg2ODl9.6g-uHDjbeR9ndQRI5pTX3Uan2zfhRcGkHm1gtUXq03og-4RMo6vSPGkIlsfRf6JGs9AnhLRoG2AjCaaG-w20UQ";
+    mapkit.init({
+        authorizationCallback: done => { done(jwt); }
+    });
+};
+
+const main = async() => {
+    await setupMapKitJs();
+
+    // Create the Map and Geocoder
+    const map = new mapkit.Map("map");
+    const geocoder = new mapkit.Geocoder({ language: "en-US" });
+    // Create the "Event" annotation, setting properties in the constructor.
+
+    var calloutDelegate = {
+        // Return a div element and populate it with information from the
+        // annotation, including a link to a review site.
+        calloutContentForAnnotation: function(annotation) {
+            var element = document.createElement("div");
+            element.className = "review-callout-content";
+            var title = element.appendChild(document.createElement("div"));
+            title.className = "callout_title";
+            title.textContent = annotation.title;
+            var desc = element.appendChild(document.createElement("div"));
+            desc.className = "callout_desc";
+            desc.textContent = annotation.subtitle;
+            // TODO add event btn
+            var event_btn = element.appendChild(document.createElement("button"));
+            event_btn.id = "callout_event";
+            event_btn.textContent = "create event";
+            event_btn.addEventListener("click", event => {
+                dispatch("add_event", {
+                    location_title: annotation.title
+                });
             });
-            map.addAnnotation(clickAnnotation);
-        };
+            // TODO edit location btn
+            var edit_btn = element.appendChild(document.createElement("button"));
+            edit_btn.id = "callout_edit";
+            edit_btn.textContent = "edit location";
+            edit_btn.addEventListener("click", event => {
+                console.log(annotation);
+                lattd_in = annotation.coordinate.latitude;
+                lngtd_in = annotation.coordinate.longitude;
+                loc_name_in = annotation.title;
+                loc_desc_in = annotation.subtitle;
+                document.getElementById("add_loc_btn").value = "save";
+                document.getElementById("location_new").style.display = "flex";
+            });
+            // TODO delete location btn
+            var delete_btn = element.appendChild(document.createElement("button"));
+            delete_btn.id = "callout_delete";
+            delete_btn.textContent = "delete";
+            return element;
+        }
+    };
+
+    annotations = [];
+    for (let i = 0; i < locations.length; i++){
+        const event = new mapkit.Coordinate(locations[i].lattd, locations[i].lngtd);
+        const eventAnnotation = new mapkit.MarkerAnnotation(event, {
+            callout: calloutDelegate,
+            color: "#4eabe9",
+            title: locations[i].name,
+            subtitle: locations[i].desc,
+            glyphText: "\u{1F37F}" // Popcorn Emoji
+        });
+        annotations.push(eventAnnotation);
+    }
+    
+
+    // Create the "Work" annotation, setting properties after construction.
+    // const work = new mapkit.Coordinate(37.3349, -122.0090);
+    // const workAnnotation = new mapkit.MarkerAnnotation(work);
+    // workAnnotation.color = "#969696";
+    // workAnnotation.title = "Work";
+    // workAnnotation.subtitle = "Apple Park";
+    // workAnnotation.selected = "true";
+    // workAnnotation.glyphText = "\u{F8FF}"; // Apple Symbol
+
+    // Add and show both annotations on the map
+    map.showItems(annotations);
+
+    // This will contain the user-set single-tap annotation.
+    let clickAnnotation = null;
+
+    // Add or move an annotation when a user single-taps an empty space
+    map.addEventListener("single-tap", event => {
+        if (type == "home") return;
+        if (clickAnnotation && !added_last) {
+            map.removeAnnotation(clickAnnotation);
+        }else if (added_last){
+            added_last = false;
+        }
+
+        // Get the clicked coordinate and add an annotation there
+        const point = event.pointOnPage;
+        const coordinate = map.convertPointOnPageToCoordinate(point);
+
+        clickAnnotation = new mapkit.MarkerAnnotation(coordinate, {
+            title: "Loading...",
+            color: "#c969e0"
+        });
+
+        map.addAnnotation(clickAnnotation);
+
+        // Look up the address with the Geocoder's Reverse Lookup Function
+        geocoder.reverseLookup(coordinate, (error, data) => {
+            const first = (!error && data.results) ? data.results[0] : null;
+            clickAnnotation.title = (first && first.name) || "";
+            loc_name_in = clickAnnotation.title;
+        });
+        lattd_in = coordinate.latitude;
+        lngtd_in = coordinate.longitude;
+        document.getElementById("location_new").style.display = "flex";
+    });
+
+};
+
+if (browser) main();
+
+const add_location = async () => {
+        const url = `/apis/map/add_location`;
+        const response = await fetch(url, {
+            method: "post",
+            body: JSON.stringify({
+                type: type,
+                name: loc_name_in,
+                desc: loc_desc_in,
+                lattd: lattd_in,
+                lngtd: lngtd_in
+            })
+        });
+        if (response.ok) {
+            // annotations
+            loc_desc_in = "";
+            loc_name_in = "";
+            lattd_in = 0;
+            lngtd_in = 0;
+            document.getElementById("location_new").style.display = "none";
+
+            dispatch('map_update');
+            added_last = true;
+        }
+    }
+
 </script>
 
 
@@ -79,8 +188,13 @@
         {:else}
             <p>No locations added yet.</p>
         {/if}
+        <div class="location" id="location_new">
+            <input type="text" name="location_name_in" bind:value={loc_name_in} placeholder="Name">
+            <input type="text" name="location_desc_in" bind:value={loc_desc_in} placeholder="Description">
+            <input type="submit" id="add_loc_btn" value="Add Location" on:click={add_location}>
+        </div>
     </div>
-    <div id="map" on:click={add_annotation}></div>
+    <div id="map"></div>
 </div>
 
 
@@ -101,7 +215,8 @@
 #map {
    width: 100%;
    height: 600px;
-
+   margin-left: 80px;
+    margin-right: 40px;
 }
 
 #map_container {
@@ -121,6 +236,23 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+}
+
+.location {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    width: 100%;
+    
+}
+
+#location_new {
+    display: none;
+    justify-content: space-between;
+}
+
+.location > div {
+    margin: 5px;
 }
 
 
