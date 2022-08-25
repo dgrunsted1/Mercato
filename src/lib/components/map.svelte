@@ -13,6 +13,7 @@ import Clothes from '$lib/icons/Clothes.svelte';
    let loc_desc_in = "";
    let annotations = [];
    let added_last = false;
+   let edit_loc_name;
 
 /**
  * Creates a script tag that loads the MapKitJS Library and then
@@ -70,10 +71,10 @@ const main = async() => {
                 console.log(annotation);
                 lattd_in = annotation.coordinate.latitude;
                 lngtd_in = annotation.coordinate.longitude;
-                loc_name_in = annotation.title;
-                loc_desc_in = annotation.subtitle;
-                document.getElementById("add_loc_btn").value = "save";
-                document.getElementById("location_new").style.display = "flex";
+
+                edit_loc_name = annotation.title;
+                // document.getElementById("add_loc_btn").value = "save";
+                // document.getElementById("location_new").style.display = "flex";
             });
             // TODO delete location btn
             var delete_btn = element.appendChild(document.createElement("button"));
@@ -137,6 +138,7 @@ const main = async() => {
             const first = (!error && data.results) ? data.results[0] : null;
             clickAnnotation.title = (first && first.name) || "";
             loc_name_in = clickAnnotation.title;
+            edit_loc_name = loc_name_in;
         });
         lattd_in = coordinate.latitude;
         lngtd_in = coordinate.longitude;
@@ -147,7 +149,8 @@ const main = async() => {
 
 if (browser) main();
 
-const add_location = async () => {
+const add_location = async (event) => {
+        if (document.getElementById("edit_name")) console.log(document.getElementById("edit_name").value);
         const url = `/apis/map/add_location`;
         const response = await fetch(url, {
             method: "post",
@@ -161,6 +164,7 @@ const add_location = async () => {
         });
         if (response.ok) {
             // annotations
+            edit_loc_name = "";
             loc_desc_in = "";
             loc_name_in = "";
             lattd_in = 0;
@@ -172,6 +176,27 @@ const add_location = async () => {
         }
     }
 
+    const edit_location = async (event) => {
+        console.log("here");
+        const url = `/apis/map/update_location`;
+            const response = await fetch(url, {
+                method: "post",
+                body: JSON.stringify({
+                    id: document.getElementById("edit_loc_id").value,
+                    name: document.getElementById("edit_name").value,
+                    desc: document.getElementById("edit_desc").value
+                })
+            });
+            if (response.ok) {
+                // annotations
+                edit_loc_name = "";
+                lattd_in = 0;
+                lngtd_in = 0;
+                dispatch('map_update');
+                added_last = true;
+            }
+    }
+
 </script>
 
 
@@ -180,10 +205,19 @@ const add_location = async () => {
         <div id="list_header">{type} Locations</div>
         {#if locations.length}
             {#each locations as location}
-                <div class="location" id={location.id}>
-                    <div class="loc_name">{location.name}</div>
-                    <div class="loc_description">{location.desc}</div>
-                </div>
+                {#if location.name != edit_loc_name}
+                    <div class="location" id={location.id}>
+                        <div class="loc_name">{location.name}</div>
+                        <div class="loc_description">{location.desc}</div>
+                    </div>
+                {:else}
+                    <div class="location" id="location_edit">
+                        <input type="text" name="location_name_in" id="edit_name" value={location.name} placeholder="Name">
+                        <input type="text" name="location_desc_in" id="edit_desc" value={location.desc} placeholder="Description">
+                        <input type="text" id="edit_loc_id" style="display=none;" value={location.id}>
+                        <input type="submit" id="add_loc_btn" value="save" on:click={edit_location}>
+                    </div>
+                {/if}
             {/each}
         {:else}
             <p>No locations added yet.</p>
