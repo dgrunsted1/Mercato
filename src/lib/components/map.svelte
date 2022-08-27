@@ -68,7 +68,6 @@ const main = async() => {
             edit_btn.id = "callout_edit";
             edit_btn.textContent = "edit location";
             edit_btn.addEventListener("click", event => {
-                console.log(annotation);
                 lattd_in = annotation.coordinate.latitude;
                 lngtd_in = annotation.coordinate.longitude;
 
@@ -80,6 +79,27 @@ const main = async() => {
             var delete_btn = element.appendChild(document.createElement("button"));
             delete_btn.id = "callout_delete";
             delete_btn.textContent = "delete";
+            delete_btn.addEventListener("click", event => {
+                edit_loc_name = annotation.title;
+                setTimeout(() => {
+                    confirm("Delete this location?");
+                    const url = `/apis/map/delete_location`;
+                    const response = fetch(url, {
+                        method: "post",
+                        body: JSON.stringify({
+                            id: document.getElementById("edit_loc_id").value,
+                            act_loc_id: document.getElementById("edit_act_loc_id").value
+                        })
+                    });
+                        edit_loc_name = "";
+                        lattd_in = 0;
+                        lngtd_in = 0;
+                        document.getElementById("location_edit").style.display = "none";
+                        dispatch('map_update');
+                        added_last = true;
+                }, 500);
+                
+            });
             return element;
         }
     };
@@ -177,7 +197,6 @@ const add_location = async (event) => {
     }
 
     const edit_location = async (event) => {
-        console.log("here");
         const url = `/apis/map/update_location`;
             const response = await fetch(url, {
                 method: "post",
@@ -197,6 +216,8 @@ const add_location = async (event) => {
                 added_last = true;
             }
     }
+
+
 
 </script>
 
