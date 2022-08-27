@@ -12,7 +12,7 @@ export const post = async(data) => {
             return (err) ? err : rows;
     });
 
-    let al_query = `UPDATE activity_locations SET desc='${body.desc}' WHERE id=${body.id}`;
+    let al_query = `UPDATE activity_locations SET description='${body.desc}' WHERE id=${body.act_loc_id}`;
     console.log({al_query});
     let al_results = await mysqlconn.query(al_query)
         .then(function([rows, fields, err]) {

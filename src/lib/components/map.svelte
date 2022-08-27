@@ -184,7 +184,8 @@ const add_location = async (event) => {
                 body: JSON.stringify({
                     id: document.getElementById("edit_loc_id").value,
                     name: document.getElementById("edit_name").value,
-                    desc: document.getElementById("edit_desc").value
+                    desc: document.getElementById("edit_desc").value,
+                    act_loc_id: document.getElementById("edit_act_loc_id").value
                 })
             });
             if (response.ok) {
@@ -215,6 +216,7 @@ const add_location = async (event) => {
                         <input type="text" name="location_name_in" id="edit_name" value={location.name} placeholder="Name">
                         <input type="text" name="location_desc_in" id="edit_desc" value={location.desc} placeholder="Description">
                         <input type="text" id="edit_loc_id" style="display=none;" value={location.id}>
+                        <input type="text" id="edit_act_loc_id" style="display=none;" value={location.activity_location_id}>
                         <input type="submit" id="add_loc_btn" value="save" on:click={edit_location}>
                     </div>
                 {/if}
