@@ -2,18 +2,18 @@
 
 <script>
     import { browser } from '$app/env';
-import Clothes from '$lib/icons/Clothes.svelte';
+    import Clothes from '$lib/icons/Clothes.svelte';
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher() ;
-   export let type;
-   export let locations;
-   let lattd_in = 0;
-   let lngtd_in = 0;
-   let loc_name_in = "";
-   let loc_desc_in = "";
-   let annotations = [];
-   let added_last = false;
-   let edit_loc_name;
+    export let type;
+    export let locations;
+    let lattd_in = 0;
+    let lngtd_in = 0;
+    let loc_name_in = "";
+    let loc_desc_in = "";
+    let annotations = [];
+    let added_last = false;
+    let edit_loc_name;
 
 /**
  * Creates a script tag that loads the MapKitJS Library and then
@@ -34,7 +34,16 @@ import Clothes from '$lib/icons/Clothes.svelte';
     });
 };
 
-const main = async() => {
+const main = async(locations_in) => {
+    console.log("main");
+    console.log({locations_in});
+    if (document.getElementById("map").innerHTML){
+        document.getElementById("map").innerHTML = "";
+        let temp_div = document.createElement("div");
+        temp_div.id = "map";
+        document.getElementById("map_container")?.append(document.createElement("div"));
+    }
+    
     await setupMapKitJs();
 
     // Create the Map and Geocoder
@@ -105,13 +114,13 @@ const main = async() => {
     };
 
     annotations = [];
-    for (let i = 0; i < locations.length; i++){
-        const event = new mapkit.Coordinate(locations[i].lattd, locations[i].lngtd);
+    for (let i = 0; i < locations_in.length; i++){
+        const event = new mapkit.Coordinate(locations_in[i].lattd, locations_in[i].lngtd);
         const eventAnnotation = new mapkit.MarkerAnnotation(event, {
             callout: calloutDelegate,
             color: "#4eabe9",
-            title: locations[i].name,
-            subtitle: locations[i].desc,
+            title: locations_in[i].name,
+            subtitle: locations_in[i].desc,
             glyphText: "\u{1F37F}" // Popcorn Emoji
         });
         annotations.push(eventAnnotation);
@@ -167,7 +176,7 @@ const main = async() => {
 
 };
 
-if (browser) main();
+$:{if (browser) main(locations)}
 
 const add_location = async (event) => {
         if (document.getElementById("edit_name")) console.log(document.getElementById("edit_name").value);
