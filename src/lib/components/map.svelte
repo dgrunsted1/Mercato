@@ -167,7 +167,7 @@ const main = async(locations_in) => {
         document.getElementById("location_new").style.display = "flex";
     });
 
-    afterUpdate(() => {
+    const change_tab = () => {
         map.removeAnnotations(annotations);
         annotations = [];
         console.log(locations);
@@ -183,7 +183,7 @@ const main = async(locations_in) => {
             annotations.push(eventAnnotation);
         }
         map.showItems(annotations);
-    });
+    }
 
     // let tabs = document.getElementsByClassName("tab");
     // for (let curr_tab in tabs){
@@ -216,8 +216,10 @@ const main = async(locations_in) => {
 };
 
 
-if (browser) main(locations)
-
+afterUpdate(() =>{
+    document.getElementById("map").innerHTML = "";
+    main(locations);
+})
 
 
 const add_location = async (event) => {
