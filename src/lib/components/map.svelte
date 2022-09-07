@@ -3,7 +3,7 @@
 <script>
     import { browser } from '$app/env';
     import Clothes from '$lib/icons/Clothes.svelte';
-    import { createEventDispatcher } from 'svelte';
+    import { afterUpdate, createEventDispatcher, tick } from 'svelte';
     const dispatch = createEventDispatcher() ;
     export let type;
     export let locations;
@@ -37,34 +37,37 @@
 const main = async(locations_in) => {
     console.log("main");
     console.log({locations_in});
-    if (document.getElementById("map").innerHTML){
-        document.getElementById("map").innerHTML = "";
-        let temp_div = document.createElement("div");
-        temp_div.id = "map";
-        document.getElementById("map_container")?.append(document.createElement("div"));
-    }
+    // return;
+    // if (document.getElementById("map").innerHTML){
+        // document.getElementById("map").innerHTML = "";
+        // let temp_div = document.createElement("div");
+        // temp_div.id = "map";
+        // document.getElementById("map_container")?.append(temp_div);
     
     await setupMapKitJs();
 
     // Create the Map and Geocoder
-    const map = new mapkit.Map("map");
+        const map = new mapkit.Map("map", {
+            showsUserLocation: true
+        });
+    
     const geocoder = new mapkit.Geocoder({ language: "en-US" });
     // Create the "Event" annotation, setting properties in the constructor.
 
-    var calloutDelegate = {
+    let calloutDelegate = {
         // Return a div element and populate it with information from the
         // annotation, including a link to a review site.
         calloutContentForAnnotation: function(annotation) {
-            var element = document.createElement("div");
+            let element = document.createElement("div");
             element.className = "review-callout-content";
-            var title = element.appendChild(document.createElement("div"));
+            let title = element.appendChild(document.createElement("div"));
             title.className = "callout_title";
             title.textContent = annotation.title;
-            var desc = element.appendChild(document.createElement("div"));
+            let desc = element.appendChild(document.createElement("div"));
             desc.className = "callout_desc";
             desc.textContent = annotation.subtitle;
             // TODO add event btn
-            var event_btn = element.appendChild(document.createElement("button"));
+            let event_btn = element.appendChild(document.createElement("button"));
             event_btn.id = "callout_event";
             event_btn.textContent = "create event";
             event_btn.addEventListener("click", event => {
@@ -73,7 +76,7 @@ const main = async(locations_in) => {
                 });
             });
             // TODO edit location btn
-            var edit_btn = element.appendChild(document.createElement("button"));
+            let edit_btn = element.appendChild(document.createElement("button"));
             edit_btn.id = "callout_edit";
             edit_btn.textContent = "edit location";
             edit_btn.addEventListener("click", event => {
@@ -85,7 +88,7 @@ const main = async(locations_in) => {
                 // document.getElementById("location_new").style.display = "flex";
             });
             // TODO delete location btn
-            var delete_btn = element.appendChild(document.createElement("button"));
+            let delete_btn = element.appendChild(document.createElement("button"));
             delete_btn.id = "callout_delete";
             delete_btn.textContent = "delete";
             delete_btn.addEventListener("click", event => {
@@ -125,16 +128,6 @@ const main = async(locations_in) => {
         });
         annotations.push(eventAnnotation);
     }
-    
-
-    // Create the "Work" annotation, setting properties after construction.
-    // const work = new mapkit.Coordinate(37.3349, -122.0090);
-    // const workAnnotation = new mapkit.MarkerAnnotation(work);
-    // workAnnotation.color = "#969696";
-    // workAnnotation.title = "Work";
-    // workAnnotation.subtitle = "Apple Park";
-    // workAnnotation.selected = "true";
-    // workAnnotation.glyphText = "\u{F8FF}"; // Apple Symbol
 
     // Add and show both annotations on the map
     map.showItems(annotations);
@@ -174,9 +167,58 @@ const main = async(locations_in) => {
         document.getElementById("location_new").style.display = "flex";
     });
 
+    afterUpdate(() => {
+        map.removeAnnotations(annotations);
+        annotations = [];
+        console.log(locations);
+        for (let i = 0; i < locations.length; i++){
+            const event = new mapkit.Coordinate(locations[i].lattd, locations[i].lngtd);
+            const eventAnnotation = new mapkit.MarkerAnnotation(event, {
+                callout: calloutDelegate,
+                color: "#4eabe9",
+                title: locations[i].name,
+                subtitle: locations[i].desc,
+                glyphText: "\u{1F37F}" // Popcorn Emoji
+            });
+            annotations.push(eventAnnotation);
+        }
+        map.showItems(annotations);
+    });
+
+    // let tabs = document.getElementsByClassName("tab");
+    // for (let curr_tab in tabs){
+
+    //     console.log(tabs[curr_tab]);
+    //     tabs[curr_tab].addEventListener("click", event => {
+    //         map.removeAnnotations(annotations);
+    //         annotations = [];
+    //         async () => {
+    //             await tick();
+    //             console.log(locations);
+    //             for (let i = 0; i < locations.length; i++){
+    //                 const event = new mapkit.Coordinate(locations[i].lattd, locations[i].lngtd);
+    //                 const eventAnnotation = new mapkit.MarkerAnnotation(event, {
+    //                     callout: calloutDelegate,
+    //                     color: "#4eabe9",
+    //                     title: locations[i].name,
+    //                     subtitle: locations[i].desc,
+    //                     glyphText: "\u{1F37F}" // Popcorn Emoji
+    //                 });
+    //                 annotations.push(eventAnnotation);
+    //             }
+    //             map.showItems(annotations);
+    //         }
+    //     });
+    // }
+
+
+
 };
 
-$:{if (browser) main(locations)}
+
+if (browser) main(locations)
+
+
 
 const add_location = async (event) => {
         if (document.getElementById("edit_name")) console.log(document.getElementById("edit_name").value);
