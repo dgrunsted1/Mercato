@@ -2,17 +2,18 @@
 
 <script>
     import { browser } from '$app/env';
-import Clothes from '$lib/icons/Clothes.svelte';
-    import { createEventDispatcher } from 'svelte';
+    import Clothes from '$lib/icons/Clothes.svelte';
+    import { afterUpdate, createEventDispatcher, tick } from 'svelte';
     const dispatch = createEventDispatcher() ;
-   export let type;
-   export let locations;
-   let lattd_in = 0;
-   let lngtd_in = 0;
-   let loc_name_in = "";
-   let loc_desc_in = "";
-   let annotations = [];
-   let added_last = false;
+    export let type;
+    export let locations;
+    let lattd_in = 0;
+    let lngtd_in = 0;
+    let loc_name_in = "";
+    let loc_desc_in = "";
+    let annotations = [];
+    let added_last = false;
+    let edit_loc_name;
 
 /**
  * Creates a script tag that loads the MapKitJS Library and then
@@ -33,28 +34,40 @@ import Clothes from '$lib/icons/Clothes.svelte';
     });
 };
 
-const main = async() => {
+const main = async(locations_in) => {
+    console.log("main");
+    console.log({locations_in});
+    // return;
+    // if (document.getElementById("map").innerHTML){
+        // document.getElementById("map").innerHTML = "";
+        // let temp_div = document.createElement("div");
+        // temp_div.id = "map";
+        // document.getElementById("map_container")?.append(temp_div);
+    
     await setupMapKitJs();
 
     // Create the Map and Geocoder
-    const map = new mapkit.Map("map");
+        const map = new mapkit.Map("map", {
+            showsUserLocation: true
+        });
+    
     const geocoder = new mapkit.Geocoder({ language: "en-US" });
     // Create the "Event" annotation, setting properties in the constructor.
 
-    var calloutDelegate = {
+    let calloutDelegate = {
         // Return a div element and populate it with information from the
         // annotation, including a link to a review site.
         calloutContentForAnnotation: function(annotation) {
-            var element = document.createElement("div");
+            let element = document.createElement("div");
             element.className = "review-callout-content";
-            var title = element.appendChild(document.createElement("div"));
+            let title = element.appendChild(document.createElement("div"));
             title.className = "callout_title";
             title.textContent = annotation.title;
-            var desc = element.appendChild(document.createElement("div"));
+            let desc = element.appendChild(document.createElement("div"));
             desc.className = "callout_desc";
             desc.textContent = annotation.subtitle;
             // TODO add event btn
-            var event_btn = element.appendChild(document.createElement("button"));
+            let event_btn = element.appendChild(document.createElement("button"));
             event_btn.id = "callout_event";
             event_btn.textContent = "create event";
             event_btn.addEventListener("click", event => {
@@ -63,48 +76,58 @@ const main = async() => {
                 });
             });
             // TODO edit location btn
-            var edit_btn = element.appendChild(document.createElement("button"));
+            let edit_btn = element.appendChild(document.createElement("button"));
             edit_btn.id = "callout_edit";
             edit_btn.textContent = "edit location";
             edit_btn.addEventListener("click", event => {
-                console.log(annotation);
                 lattd_in = annotation.coordinate.latitude;
                 lngtd_in = annotation.coordinate.longitude;
-                loc_name_in = annotation.title;
-                loc_desc_in = annotation.subtitle;
-                document.getElementById("add_loc_btn").value = "save";
-                document.getElementById("location_new").style.display = "flex";
+
+                edit_loc_name = annotation.title;
+                // document.getElementById("add_loc_btn").value = "save";
+                // document.getElementById("location_new").style.display = "flex";
             });
             // TODO delete location btn
-            var delete_btn = element.appendChild(document.createElement("button"));
+            let delete_btn = element.appendChild(document.createElement("button"));
             delete_btn.id = "callout_delete";
             delete_btn.textContent = "delete";
+            delete_btn.addEventListener("click", event => {
+                edit_loc_name = annotation.title;
+                setTimeout(() => {
+                    confirm("Delete this location?");
+                    const url = `/apis/map/delete_location`;
+                    const response = fetch(url, {
+                        method: "post",
+                        body: JSON.stringify({
+                            id: document.getElementById("edit_loc_id").value,
+                            act_loc_id: document.getElementById("edit_act_loc_id").value
+                        })
+                    });
+                        edit_loc_name = "";
+                        lattd_in = 0;
+                        lngtd_in = 0;
+                        document.getElementById("location_edit").style.display = "none";
+                        dispatch('map_update');
+                        added_last = true;
+                }, 500);
+                
+            });
             return element;
         }
     };
 
     annotations = [];
-    for (let i = 0; i < locations.length; i++){
-        const event = new mapkit.Coordinate(locations[i].lattd, locations[i].lngtd);
+    for (let i = 0; i < locations_in.length; i++){
+        const event = new mapkit.Coordinate(locations_in[i].lattd, locations_in[i].lngtd);
         const eventAnnotation = new mapkit.MarkerAnnotation(event, {
             callout: calloutDelegate,
             color: "#4eabe9",
-            title: locations[i].name,
-            subtitle: locations[i].desc,
+            title: locations_in[i].name,
+            subtitle: locations_in[i].desc,
             glyphText: "\u{1F37F}" // Popcorn Emoji
         });
         annotations.push(eventAnnotation);
     }
-    
-
-    // Create the "Work" annotation, setting properties after construction.
-    // const work = new mapkit.Coordinate(37.3349, -122.0090);
-    // const workAnnotation = new mapkit.MarkerAnnotation(work);
-    // workAnnotation.color = "#969696";
-    // workAnnotation.title = "Work";
-    // workAnnotation.subtitle = "Apple Park";
-    // workAnnotation.selected = "true";
-    // workAnnotation.glyphText = "\u{F8FF}"; // Apple Symbol
 
     // Add and show both annotations on the map
     map.showItems(annotations);
@@ -137,17 +160,70 @@ const main = async() => {
             const first = (!error && data.results) ? data.results[0] : null;
             clickAnnotation.title = (first && first.name) || "";
             loc_name_in = clickAnnotation.title;
+            edit_loc_name = loc_name_in;
         });
         lattd_in = coordinate.latitude;
         lngtd_in = coordinate.longitude;
         document.getElementById("location_new").style.display = "flex";
     });
 
+    const change_tab = () => {
+        map.removeAnnotations(annotations);
+        annotations = [];
+        console.log(locations);
+        for (let i = 0; i < locations.length; i++){
+            const event = new mapkit.Coordinate(locations[i].lattd, locations[i].lngtd);
+            const eventAnnotation = new mapkit.MarkerAnnotation(event, {
+                callout: calloutDelegate,
+                color: "#4eabe9",
+                title: locations[i].name,
+                subtitle: locations[i].desc,
+                glyphText: "\u{1F37F}" // Popcorn Emoji
+            });
+            annotations.push(eventAnnotation);
+        }
+        map.showItems(annotations);
+    }
+
+    // let tabs = document.getElementsByClassName("tab");
+    // for (let curr_tab in tabs){
+
+    //     console.log(tabs[curr_tab]);
+    //     tabs[curr_tab].addEventListener("click", event => {
+    //         map.removeAnnotations(annotations);
+    //         annotations = [];
+    //         async () => {
+    //             await tick();
+    //             console.log(locations);
+    //             for (let i = 0; i < locations.length; i++){
+    //                 const event = new mapkit.Coordinate(locations[i].lattd, locations[i].lngtd);
+    //                 const eventAnnotation = new mapkit.MarkerAnnotation(event, {
+    //                     callout: calloutDelegate,
+    //                     color: "#4eabe9",
+    //                     title: locations[i].name,
+    //                     subtitle: locations[i].desc,
+    //                     glyphText: "\u{1F37F}" // Popcorn Emoji
+    //                 });
+    //                 annotations.push(eventAnnotation);
+    //             }
+    //             map.showItems(annotations);
+    //         }
+    //     });
+    // }
+
+
+
 };
 
-if (browser) main();
 
-const add_location = async () => {
+afterUpdate(() =>{
+    document.getElementById("map").innerHTML = "";
+    main(locations);
+})
+
+
+const add_location = async (event) => {
+        if (document.getElementById("edit_name")) console.log(document.getElementById("edit_name").value);
         const url = `/apis/map/add_location`;
         const response = await fetch(url, {
             method: "post",
@@ -161,6 +237,7 @@ const add_location = async () => {
         });
         if (response.ok) {
             // annotations
+            edit_loc_name = "";
             loc_desc_in = "";
             loc_name_in = "";
             lattd_in = 0;
@@ -172,6 +249,29 @@ const add_location = async () => {
         }
     }
 
+    const edit_location = async (event) => {
+        const url = `/apis/map/update_location`;
+            const response = await fetch(url, {
+                method: "post",
+                body: JSON.stringify({
+                    id: document.getElementById("edit_loc_id").value,
+                    name: document.getElementById("edit_name").value,
+                    desc: document.getElementById("edit_desc").value,
+                    act_loc_id: document.getElementById("edit_act_loc_id").value
+                })
+            });
+            if (response.ok) {
+                // annotations
+                edit_loc_name = "";
+                lattd_in = 0;
+                lngtd_in = 0;
+                dispatch('map_update');
+                added_last = true;
+            }
+    }
+
+
+
 </script>
 
 
@@ -180,10 +280,20 @@ const add_location = async () => {
         <div id="list_header">{type} Locations</div>
         {#if locations.length}
             {#each locations as location}
-                <div class="location" id={location.id}>
-                    <div class="loc_name">{location.name}</div>
-                    <div class="loc_description">{location.desc}</div>
-                </div>
+                {#if location.name != edit_loc_name}
+                    <div class="location" id={location.id}>
+                        <div class="loc_name">{location.name}</div>
+                        <div class="loc_description">{location.desc}</div>
+                    </div>
+                {:else}
+                    <div class="location" id="location_edit">
+                        <input type="text" name="location_name_in" id="edit_name" value={location.name} placeholder="Name">
+                        <input type="text" name="location_desc_in" id="edit_desc" value={location.desc} placeholder="Description">
+                        <input type="text" id="edit_loc_id" style="display=none;" value={location.id}>
+                        <input type="text" id="edit_act_loc_id" style="display=none;" value={location.activity_location_id}>
+                        <input type="submit" id="add_loc_btn" value="save" on:click={edit_location}>
+                    </div>
+                {/if}
             {/each}
         {:else}
             <p>No locations added yet.</p>

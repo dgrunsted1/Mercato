@@ -1,5 +1,5 @@
 <script context="module">
-    let type = "beach";
+    let type = "home";
     let user_id = 1;
     export async function load({ fetch }) {
         const url = `/apis/schedule/get_activity_schedule`;
