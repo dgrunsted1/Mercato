@@ -208,7 +208,6 @@
 <style>
 
     #page {
-        position: absolute;
         margin: 2px;
         display: flex;
         flex-direction: column;
