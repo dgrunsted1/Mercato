@@ -325,7 +325,7 @@ const add_location = async (event) => {
 #map {
    width: 100%;
    height: 600px;
-   margin-left: 80px;
+   margin-left: 20px;
     margin-right: 40px;
 }
 
@@ -340,12 +340,13 @@ const add_location = async (event) => {
 }
 
 #list_container {
-    width: 50%;
+    width: 75%;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    overflow: scroll;
 }
 
 .location {
