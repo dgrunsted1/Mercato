@@ -81,7 +81,7 @@ export const post = async(data) => {
         }
         let locations = [];
         let and_activity = (type != 'home') ? ` AND a.type = '${type}'` :``;
-        let loc_query = `SELECT l.name as name, l.id as location_id, al.description as description, l.lattd as lattd, l.lngtd as lngtd, al.id as activity_location_id FROM locations AS l JOIN activity_locations AS al ON l.id = al.location_id JOIN activity_users AS au ON au.activity_id=al.activity_id JOIN activities AS a ON a.id=al.activity_id WHERE au.user_id=${user}${and_activity}`;
+        let loc_query = `SELECT l.name as name, l.id as location_id, al.description as description, l.lattd as lattd, l.lngtd as lngtd, al.id as activity_location_id, al.is_checked as is_checked FROM locations AS l JOIN activity_locations AS al ON l.id = al.location_id JOIN activity_users AS au ON au.activity_id=al.activity_id JOIN activities AS a ON a.id=al.activity_id WHERE au.user_id=${user}${and_activity}`;
         let loc_results = await mysqlconn.query(loc_query)
         .then(function([rows, fields, err]) {
             return (err) ? err : rows;
@@ -94,7 +94,8 @@ export const post = async(data) => {
                 desc: loc_results[i].description,
                 lattd: Number(loc_results[i].lattd),
                 lngtd: Number(loc_results[i].lngtd),
-                activity_location_id: loc_results[i].activity_location_id
+                activity_location_id: loc_results[i].activity_location_id,
+                is_checked: Number(loc_results[i].is_checked)
             });
         }
     return {

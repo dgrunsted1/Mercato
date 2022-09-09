@@ -270,6 +270,32 @@ const add_location = async (event) => {
             }
     }
 
+    const check_location = async (event) => {
+        const url = `/apis/map/check_location`;
+        let temp_id = (event.target.getAttribute('data-id')) ? event.target.getAttribute('data-id') : event.target.parentElement.getAttribute('data-id');
+        let temp_element_id = (event.target.id) ? event.target.id : event.target.parentElement.id;
+        document.getElementById(temp_element_id)?.classList.add("checked");
+        const response = await fetch(url, {
+            method: "post",
+            body: JSON.stringify({
+                act_loc_id: temp_id
+            })
+        });
+    }
+
+    const uncheck_location = async (event) => {
+        const url = `/apis/map/uncheck_location`;
+        let temp_id = (event.target.getAttribute('data-id')) ? event.target.getAttribute('data-id') : event.target.parentElement.getAttribute('data-id');
+        let temp_element_id = (event.target.id) ? event.target.id : event.target.parentElement.id;
+        document.getElementById(temp_element_id)?.classList.remove("checked");
+        const response = await fetch(url, {
+            method: "post",
+            body: JSON.stringify({
+                act_loc_id: temp_id
+            })
+        });
+    }
+
 
 
 </script>
@@ -281,10 +307,17 @@ const add_location = async (event) => {
         {#if locations.length}
             {#each locations as location}
                 {#if location.name != edit_loc_name}
-                    <div class="location" id={location.id}>
-                        <div class="loc_name">{location.name}</div>
-                        <div class="loc_description">{location.desc}</div>
-                    </div>
+                        {#if location.is_checked}
+                        <div class="location checked" id={location.id} data-id={location.activity_location_id} on:click={uncheck_location}>
+                            <div class="loc_name">{location.name}</div>
+                            <div class="loc_description">{location.desc}</div>
+                        </div>
+                        {:else}
+                        <div class="location" id={location.id} data-id={location.activity_location_id} on:click={check_location}>
+                            <div class="loc_name">{location.name}</div>
+                            <div class="loc_description">{location.desc}</div>
+                        </div>
+                        {/if}
                 {:else}
                     <div class="location" id="location_edit">
                         <input type="text" name="location_name_in" id="edit_name" value={location.name} placeholder="Name">
@@ -357,6 +390,13 @@ const add_location = async (event) => {
     
 }
 
+.checked {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    text-decoration-color: black;
+    transition: clip-path 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
 #location_new {
     display: none;
     justify-content: space-between;
@@ -364,6 +404,18 @@ const add_location = async (event) => {
 
 .location > div {
     margin: 5px;
+}
+
+.loc_name {
+    font-size: 21px;
+}
+
+.loc_description {
+    font-size: 14px;
+}
+
+#list_header {
+    font-size: 36px;
 }
 
 
