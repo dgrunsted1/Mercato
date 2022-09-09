@@ -271,23 +271,16 @@ const add_location = async (event) => {
     }
 
     const check_location = async (event) => {
-        const url = `/apis/map/check_location`;
+        let url = '';
         let temp_id = (event.target.getAttribute('data-id')) ? event.target.getAttribute('data-id') : event.target.parentElement.getAttribute('data-id');
         let temp_element_id = (event.target.id) ? event.target.id : event.target.parentElement.id;
-        document.getElementById(temp_element_id)?.classList.add("checked");
-        const response = await fetch(url, {
-            method: "post",
-            body: JSON.stringify({
-                act_loc_id: temp_id
-            })
-        });
-    }
-
-    const uncheck_location = async (event) => {
-        const url = `/apis/map/uncheck_location`;
-        let temp_id = (event.target.getAttribute('data-id')) ? event.target.getAttribute('data-id') : event.target.parentElement.getAttribute('data-id');
-        let temp_element_id = (event.target.id) ? event.target.id : event.target.parentElement.id;
-        document.getElementById(temp_element_id)?.classList.remove("checked");
+        if (document.getElementById(temp_element_id)?.classList.contains('checked')){
+            url = `/apis/map/uncheck_location`;
+            document.getElementById(temp_element_id)?.classList.remove("checked");
+        }else {
+            url = `/apis/map/check_location`;
+            document.getElementById(temp_element_id)?.classList.add("checked");
+        }
         const response = await fetch(url, {
             method: "post",
             body: JSON.stringify({
@@ -308,7 +301,7 @@ const add_location = async (event) => {
             {#each locations as location}
                 {#if location.name != edit_loc_name}
                         {#if location.is_checked}
-                        <div class="location checked" id={location.id} data-id={location.activity_location_id} on:click={uncheck_location}>
+                        <div class="location checked" id={location.id} data-id={location.activity_location_id} on:click={check_location}>
                             <div class="loc_name">{location.name}</div>
                             <div class="loc_description">{location.desc}</div>
                         </div>
