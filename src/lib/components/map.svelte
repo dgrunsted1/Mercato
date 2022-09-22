@@ -28,7 +28,7 @@
         document.head.appendChild(element);
     });
     // TODO: For production use, the JWT should not be hard-coded into JS.
-    const jwt = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjQ1NjQyVFFIQUsifQ.eyJpc3MiOiI1NjNRTFA2UzU1IiwiaWF0IjoxNjYwODU2OTI2LCJleHAiOjE2NjM0NDg2ODl9.6g-uHDjbeR9ndQRI5pTX3Uan2zfhRcGkHm1gtUXq03og-4RMo6vSPGkIlsfRf6JGs9AnhLRoG2AjCaaG-w20UQ";
+    const jwt = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjQ1NjQyVFFIQUsifQ.eyJpc3MiOiI1NjNRTFA2UzU1IiwiaWF0IjoxNjYzNzk4MjU4LCJleHAiOjE2NjYzODk4NDJ9.Hh-8RskkX1TbuDr7M7RERjSsLhmAHMuKB1jj6ro0kEp3QMJLp5YfA7R4RVihyMu5RPlD0XvU_fKanB9g_He8cg";
     mapkit.init({
         authorizationCallback: done => { done(jwt); }
     });
@@ -271,6 +271,7 @@ const add_location = async (event) => {
     }
 
     const check_location = async (event) => {
+
         let url = '';
         let temp_id = (event.target.getAttribute('data-id')) ? event.target.getAttribute('data-id') : event.target.parentElement.getAttribute('data-id');
         let temp_element_id = (event.target.id) ? event.target.id : event.target.parentElement.id;
@@ -301,14 +302,16 @@ const add_location = async (event) => {
             {#each locations as location}
                 {#if location.name != edit_loc_name}
                         {#if location.is_checked}
-                        <div class="location checked" id={location.id} data-id={location.activity_location_id} on:click={check_location}>
+                        <div class="location checked" id={location.id} data-id={location.activity_location_id}>
                             <div class="loc_name">{location.name}</div>
                             <div class="loc_description">{location.desc}</div>
+                            <div id="check {location.id}" class="check" on:click={check_location} value="uncross">X</div>
                         </div>
                         {:else}
-                        <div class="location" id={location.id} data-id={location.activity_location_id} on:click={check_location}>
+                        <div class="location" id={location.id} data-id={location.activity_location_id}>
                             <div class="loc_name">{location.name}</div>
                             <div class="loc_description">{location.desc}</div>
+                            <div id="check {location.id}" class="check" on:click={check_location} value="cross off">X</div>
                         </div>
                         {/if}
                 {:else}
@@ -323,6 +326,7 @@ const add_location = async (event) => {
             {/each}
         {:else}
             <p>No locations added yet.</p>
+            <p>add locations by clicking on the map.</p>
         {/if}
         <div class="location" id="location_new">
             <input type="text" name="location_name_in" bind:value={loc_name_in} placeholder="Name">
@@ -383,7 +387,7 @@ const add_location = async (event) => {
     
 }
 
-.checked {
+.checked > .loc_name, .checked > .loc_description {
     text-decoration: line-through;
     text-decoration-thickness: 2px;
     text-decoration-color: black;
@@ -411,7 +415,51 @@ const add_location = async (event) => {
     font-size: 36px;
 }
 
+.check {
+    /* align-items: center; */
+    appearance: none;
+    background-color: #FCFCFD;
+    border-radius: 4px;
+    border-width: 0;
+    box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 0px 8px -3px,#D6D6E7 0 -3px 0 inset;
+    box-sizing: border-box;
+    color: #36395A;
+    cursor: pointer;
+    display: inline-flex;
+    /* font-family: "JetBrains Mono",monospace; */
+    /* height: 48px; */
+    justify-content: center;
+    line-height: 1;
+    list-style: none;
+    overflow: hidden;
+    padding-left: 16px;
+    padding-right: 16px;
+    position: relative;
+    text-align: left;
+    text-decoration: none;
+    transition: box-shadow .15s,transform .15s;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: nowrap;
+    will-change: box-shadow,transform;
+    /* font-size: 18px; */
+    margin: 1px;
+    }
 
+    .check:focus {
+    box-shadow: #D6D6E7 0 0 0 1.5px inset, rgba(45, 35, 66, 0.4) 0 2px 4px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+    }
+
+    .check:hover {
+    box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+    transform: translateY(-2px);
+    }
+
+    .check:active {
+    box-shadow: #D6D6E7 0 3px 7px inset;
+    transform: translateY(2px);
+    }
 
 
 </style>

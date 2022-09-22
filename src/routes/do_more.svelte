@@ -44,18 +44,20 @@
 
 
     const set_events = async (type_in) => {
-        type = type_in;
+        console.log("set_events");
         const url = `/apis/schedule/get_activity_schedule`;
         const response = await fetch(url, {
             method: "post",
             body: JSON.stringify({
-                type: type,
+                type: type_in,
                 user: user_id
             })
         });
+        
         data = response.ok && (await response.json());
         events = data.this_week;
         locations = data.locations;
+        type = type_in;
     }
 
     const upload_entry = () => {
