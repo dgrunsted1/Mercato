@@ -271,10 +271,9 @@ const add_location = async (event) => {
     }
 
     const check_location = async (event) => {
-
         let url = '';
-        let temp_id = (event.target.getAttribute('data-id')) ? event.target.getAttribute('data-id') : event.target.parentElement.getAttribute('data-id');
-        let temp_element_id = (event.target.id) ? event.target.id : event.target.parentElement.id;
+        let temp_id = event.target.parentElement.getAttribute('data-id');
+        let temp_element_id = event.target.parentElement.id;
         if (document.getElementById(temp_element_id)?.classList.contains('checked')){
             url = `/apis/map/uncheck_location`;
             document.getElementById(temp_element_id)?.classList.remove("checked");

@@ -214,6 +214,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        font-family: "Proxima Nova", "Helvetica Neue", Verdana, Arial, sans-serif;
+        text-transform: uppercase;
     }
 
     #tabs {
