@@ -20,7 +20,6 @@
         justify-content: left;
         position: fixed;
         width: 100%;
-        background-color: white;
         top: 0;
         border-bottom: 1px solid #002919;
         z-index: 10;

@@ -4,17 +4,19 @@
     let pages = ['wordle', 'travel', 'music', 'sports', 'fashion', 'cooking', 'do_more', 'photography'];
     </script>
     
+    <body>
+        <Header />
+        <SideBar {pages} />
+        
+        <main>
+        <slot></slot>
+        </main>
+        
+        <footer>
+            <p>author: David Grunsted</p>
+        </footer>
+    </body>
     
-    <Header />
-    <SideBar {pages} />
-    
-    <main>
-    <slot></slot>
-    </main>
-    
-    <footer>
-        <p>author: David Grunsted</p>
-    </footer>
     
     
     <style>
@@ -35,5 +37,9 @@
             z-index: 0;
             max-width: 98%;
             margin: auto;
+        }
+
+        body {
+            background: #D5D2C0;
         }
     </style>

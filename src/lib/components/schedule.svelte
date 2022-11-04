@@ -135,7 +135,8 @@
         align-items: center;
     }
     .time {
-        background-color: #D9CAB3;
+        background-color: #5E4C5A;
+        color: white;
         padding: 10px 5px;
         border-radius: 5px;
     }
@@ -143,10 +144,11 @@
         border-bottom: 1px solid black;
     }
     .date {
-        background-color: #87A8A4;
+        background-color: #095341;
         width: fit-content;
         padding: 5px 10px;
         border-radius: 5px;
+        color: white;
     }
 
     @media (min-width: 640px) {
